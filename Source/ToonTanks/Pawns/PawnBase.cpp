@@ -22,6 +22,18 @@ void APawnBase::BeginPlay() {
 	Super::BeginPlay();
 }
 
+void APawnBase::RotateTurretToTarget(FVector TargetLocation) {
+
+}
+
+void APawnBase::Fire() {
+
+}
+
+void APawnBase::HandleDestruction() {
+
+}
+
 void APawnBase::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 }

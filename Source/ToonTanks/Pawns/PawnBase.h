@@ -20,6 +20,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void RotateTurretToTarget(FVector TargetLocation);
+	void Fire();
+	virtual void HandleDestruction();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
