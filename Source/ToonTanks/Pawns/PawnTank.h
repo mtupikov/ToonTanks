@@ -19,6 +19,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void HandleDestruction() override;
 
 private:
 	void CalculateMoveInput(float Value);
@@ -39,6 +40,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float RotateSpeed = 200.0f;
 	
+	APlayerController* PlayerController = nullptr;
 	FVector MoveDirection;
 	FQuat RotationDirection;
 };

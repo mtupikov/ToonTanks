@@ -23,7 +23,11 @@ void APawnBase::BeginPlay() {
 }
 
 void APawnBase::RotateTurretToTarget(FVector TargetLocation) {
+	const auto LookAtTargetClean = FVector(TargetLocation.X, TargetLocation.Y, TurretMesh->GetComponentLocation().Z);
+	const auto StartLocation = TurretMesh->GetComponentLocation();
+	const auto TurretRotation = FVector(LookAtTargetClean - StartLocation).Rotation();
 
+	TurretMesh->SetWorldRotation(TurretRotation);
 }
 
 void APawnBase::Fire() {
