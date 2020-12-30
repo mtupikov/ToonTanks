@@ -4,6 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "PawnBase.generated.h"
 
+class AProjectileBase;
 class UCapsuleComponent;
 class USceneComponent;
 class UStaticMeshComponent;
@@ -36,4 +37,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AProjectileBase> ProjectileClass;
 };

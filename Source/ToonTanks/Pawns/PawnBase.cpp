@@ -1,6 +1,7 @@
 #include "PawnBase.h"
 
 #include "Components/CapsuleComponent.h"
+#include "ToonTanks/Actors/ProjectileBase.h"
 
 APawnBase::APawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -31,7 +32,14 @@ void APawnBase::RotateTurretToTarget(FVector TargetLocation) {
 }
 
 void APawnBase::Fire() {
-
+	if (!ProjectileClass || !TurretMesh) {
+		return;
+	}
+	
+	const auto SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+	const auto SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+	AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
+	TempProjectile->SetOwner(this);
 }
 
 void APawnBase::HandleDestruction() {
