@@ -39,6 +39,7 @@ void AProjectileBase::OnHit(
 		return;
 	}
 
+	UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
 
 	Destroy();

@@ -1,6 +1,8 @@
 #include "PawnBase.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "ToonTanks/Actors/ProjectileBase.h"
 
 APawnBase::APawnBase() {
@@ -43,7 +45,7 @@ void APawnBase::Fire() {
 }
 
 void APawnBase::HandleDestruction() {
-
+	UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticle, GetActorLocation());
 }
 
 void APawnBase::Tick(float DeltaTime) {
