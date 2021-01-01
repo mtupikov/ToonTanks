@@ -4,6 +4,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AProjectileBase::AProjectileBase() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -16,6 +17,9 @@ AProjectileBase::AProjectileBase() {
 	ProjectileMovement->InitialSpeed = MovementSpeed;
 	ProjectileMovement->MaxSpeed = MovementSpeed;
 	InitialLifeSpan = 3.0f;
+
+	TrailParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Trail Particle"));
+	TrailParticle->SetupAttachment(RootComponent);
 }
 
 void AProjectileBase::BeginPlay() {
