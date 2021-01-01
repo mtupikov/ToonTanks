@@ -19,6 +19,8 @@ void APawnTank::BeginPlay() {
 
 void APawnTank::HandleDestruction() {
 	Super::HandleDestruction();
+	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraDeathShake);
+
 	bIsPlayerAlive = false;
 
 	SetActorHiddenInGame(true);

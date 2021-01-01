@@ -5,6 +5,7 @@
 #include "PawnBase.generated.h"
 
 class AProjectileBase;
+class UMatineeCameraShake;
 class UCapsuleComponent;
 class USceneComponent;
 class UStaticMeshComponent;
@@ -25,6 +26,9 @@ protected:
 	virtual void BeginPlay() override;
 	void RotateTurretToTarget(FVector TargetLocation);
 	void Fire();
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TSubclassOf<UMatineeCameraShake> CameraDeathShake;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

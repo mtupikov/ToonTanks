@@ -1,5 +1,6 @@
 #include "PawnBase.h"
 
+#include "Camera/CameraShake.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 

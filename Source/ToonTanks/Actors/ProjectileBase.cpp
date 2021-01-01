@@ -1,5 +1,6 @@
 #include "ProjectileBase.h"
 
+#include "Camera/CameraShake.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/DamageType.h"
@@ -47,6 +48,7 @@ void AProjectileBase::OnHit(
 	UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 	UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
+	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraHitShake);
 
 	Destroy();
 }

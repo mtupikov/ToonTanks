@@ -5,6 +5,7 @@
 #include "ProjectileBase.generated.h"
 
 class UDamageType;
+class UMatineeCameraShake;
 class UProjectileMovementComponent;
 class UStaticMeshComponent;
 
@@ -36,6 +37,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UDamageType> DamageType;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TSubclassOf<UMatineeCameraShake> CameraHitShake;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* HitParticle = nullptr;
