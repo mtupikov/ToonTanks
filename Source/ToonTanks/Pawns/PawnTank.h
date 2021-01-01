@@ -18,6 +18,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void HandleDestruction() override;
 
+	bool IsAlive() const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -43,4 +45,5 @@ private:
 	APlayerController* PlayerController = nullptr;
 	FVector MoveDirection;
 	FQuat RotationDirection;
+	bool bIsPlayerAlive = true;
 };
