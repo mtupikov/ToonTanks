@@ -29,6 +29,9 @@ private:
 	void HandleGameStart();
 	void HandleGameOver(bool PlayerWon);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
+	int32 StartDelay = 3;
+
 	APawnTank* PlayerTank = nullptr;
 	uint32 TargetTurretsCount = 0;
 };
