@@ -43,6 +43,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystemComponent* TrailParticle = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* HitSound = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* LaunchSound = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	float Damage = 50.0f;
 
