@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "ToonTanks/Actors/ProjectileBase.h"
+#include "ToonTanks/Components/HealthComponent.h"
 
 APawnBase::APawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -19,6 +20,8 @@ APawnBase::APawnBase() {
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
 void APawnBase::BeginPlay() {
