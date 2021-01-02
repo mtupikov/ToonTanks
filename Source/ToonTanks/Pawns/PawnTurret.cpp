@@ -15,7 +15,7 @@ void APawnTurret::Tick(float DeltaTime) {
 		return;
 	}
 
-	RotateTurretToTarget(PlayerPawn->GetTargetLocation());
+	RotateTurretToTarget(PlayerPawn->GetTargetLocation(), MaximumLeftRelativeRotation, MaximumRightRelativeRotation);
 }
 
 void APawnTurret::BeginPlay() {

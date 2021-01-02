@@ -3,6 +3,7 @@
 #include "Camera/CameraShake.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "ToonTanks/Actors/ProjectileBase.h"
 #include "ToonTanks/Components/HealthComponent.h"
@@ -35,10 +36,10 @@ APawnBase::APawnBase() {
 void APawnBase::BeginPlay() {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Turret Current Rotation: %s"), *TurretMesh->GetComponentRotation().ToString());
+	InitialRotator = TurretMesh->GetComponentRotation();
 }
 
-void APawnBase::RotateTurretToTarget(FVector TargetLocation) {
+void APawnBase::RotateTurretToTarget(FVector TargetLocation, float LeftMaxAngle, float RightMaxAngle) {
 	if (TurretRotationSpeed <= 0.0f) {
 		return;
 	}
@@ -47,8 +48,24 @@ void APawnBase::RotateTurretToTarget(FVector TargetLocation) {
 	const auto LookAtTargetClean = FVector(TargetLocation.X, TargetLocation.Y, StartLocation.Z);
 	const auto DeltaTime = GetWorld()->DeltaTimeSeconds;
 	auto TurretRotator = FRotationMatrix::MakeFromX(LookAtTargetClean - StartLocation).Rotator();
-
 	TurretRotator = FMath::RInterpConstantTo(TurretMesh->GetComponentRotation(), TurretRotator, DeltaTime, TurretRotationSpeed);
+	TurretRotator.Normalize();
+
+	FRotator LeftMaxRotator(InitialRotator);
+	if (LeftMaxAngle != MaximumRotationAngle()) {
+		LeftMaxRotator.Yaw -= LeftMaxAngle;
+		LeftMaxRotator.Normalize();
+	}
+
+	FRotator RightMaxRotator(InitialRotator);
+	if (LeftMaxAngle != MaximumRotationAngle()) {
+		RightMaxRotator.Yaw += RightMaxAngle;
+		RightMaxRotator.Normalize();
+	}
+
+	if (LeftMaxRotator != InitialRotator && RightMaxRotator != InitialRotator) {
+		TurretRotator.Yaw = UKismetMathLibrary::ClampAngle(TurretRotator.Yaw, LeftMaxRotator.Yaw, RightMaxRotator.Yaw);
+	}
 
 	TurretMesh->SetWorldRotation(TurretRotator);
 }
@@ -62,6 +79,10 @@ void APawnBase::Fire() {
 	const auto SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
 	AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
 	TempProjectile->SetOwner(this);
+}
+
+float APawnBase::MaximumRotationAngle() {
+	return 180.0f;
 }
 
 void APawnBase::HandleDestruction() {

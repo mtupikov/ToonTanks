@@ -30,6 +30,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float FireRange = 700.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float MaximumLeftRelativeRotation = APawnBase::MaximumRotationAngle(); // must be 0 <= x <= 180
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float MaximumRightRelativeRotation = APawnBase::MaximumRotationAngle(); // must be 0 <= x <= 180
+
 	FTimerHandle FireRateTimerHandle;
 	APawnTank* PlayerPawn = nullptr;
 };

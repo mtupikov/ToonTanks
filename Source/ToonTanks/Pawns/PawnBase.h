@@ -25,7 +25,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	void RotateTurretToTarget(FVector TargetLocation);
+	void RotateTurretToTarget(FVector TargetLocation, float LeftMaxAngle = 180.0f, float RightMaxAngle = 180.0f);
 	void Fire();
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
@@ -33,6 +33,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UPawnMovementComponentBase* MovementComponent = nullptr;
+
+	static float MaximumRotationAngle();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -61,4 +63,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float TurretRotationSpeed = 60.0f;
+
+	FRotator InitialRotator;
 };
