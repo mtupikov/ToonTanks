@@ -3,6 +3,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
+#include "ToonTanks/Components/PawnMovementComponentBase.h"
+
 APawnTank::APawnTank() {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArmComponent->SetupAttachment(RootComponent);
@@ -15,6 +17,10 @@ void APawnTank::BeginPlay() {
 	Super::BeginPlay();
 
 	PlayerController = Cast<APlayerController>(GetController());
+
+	if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent)) {
+		MovementComponent->SetMoveSpeed(MoveSpeed);
+	}
 }
 
 void APawnTank::HandleDestruction() {
@@ -31,29 +37,20 @@ bool APawnTank::IsAlive() const {
 	return bIsPlayerAlive;
 }
 
-void APawnTank::CalculateMoveInput(float Value) {
-	MoveDirection = FVector(Value * MoveSpeed * GetWorld()->DeltaTimeSeconds, 0, 0);
+void APawnTank::Rotate(float Value) {
+	const float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
+	const auto Rotation = FRotator(0, RotateAmount, 0);
+	AddActorLocalRotation(FQuat(Rotation), true);
 }
 
-void APawnTank::CalculateRotateInput(float Value) {
-	float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
-	auto Rotation = FRotator(0, RotateAmount, 0);
-	RotationDirection = FQuat(Rotation);
-}
-
-void APawnTank::Move() {
-	AddActorLocalOffset(MoveDirection, true);
-}
-
-void APawnTank::Rotate() {
-	AddActorLocalRotation(RotationDirection, true);
+void APawnTank::MoveForward(float Value) {
+	if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent)) {
+		MovementComponent->AddInputVector(GetActorForwardVector() * Value);
+	}
 }
 
 void APawnTank::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-
-	Rotate();
-	Move();
 
 	if (PlayerController) {
 		FHitResult TraceHitResult;
@@ -67,7 +64,7 @@ void APawnTank::Tick(float DeltaTime) {
 void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
-	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
+	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::MoveForward);
+	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::Rotate);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
 }

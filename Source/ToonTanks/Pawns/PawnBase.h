@@ -7,6 +7,7 @@
 class AProjectileBase;
 class UMatineeCameraShake;
 class UCapsuleComponent;
+class UPawnMovementComponentBase;
 class USceneComponent;
 class UStaticMeshComponent;
 class UHealthComponent;
@@ -30,6 +31,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	TSubclassOf<UMatineeCameraShake> CameraDeathShake;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPawnMovementComponentBase* MovementComponent = nullptr;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCapsuleComponent* CapsuleComponent = nullptr;
@@ -46,11 +50,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Effects")
-	USoundBase* DeathSound = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AProjectileBase> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	USoundBase* DeathSound = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* DeathParticle = nullptr;

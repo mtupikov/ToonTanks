@@ -6,12 +6,16 @@
 
 #include "ToonTanks/Actors/ProjectileBase.h"
 #include "ToonTanks/Components/HealthComponent.h"
+#include "ToonTanks/Components/PawnMovementComponentBase.h"
 
 APawnBase::APawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
 	RootComponent = CapsuleComponent;
+	CapsuleComponent->SetCapsuleHalfHeight(70);
+	CapsuleComponent->SetCapsuleRadius(70);
+	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
 
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	BaseMesh->SetupAttachment(RootComponent);
@@ -23,6 +27,9 @@ APawnBase::APawnBase() {
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+
+	MovementComponent = CreateDefaultSubobject<UPawnMovementComponentBase>(TEXT("Movement Component"));
+	MovementComponent->UpdatedComponent = RootComponent;
 }
 
 void APawnBase::BeginPlay() {

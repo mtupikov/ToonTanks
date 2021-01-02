@@ -24,11 +24,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void CalculateMoveInput(float Value);
-	void CalculateRotateInput(float Value);
-
-	void Move();
-	void Rotate();
+	void Rotate(float Value);
+	void MoveForward(float Value);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent = nullptr;
@@ -43,7 +40,5 @@ private:
 	float RotateSpeed = 200.0f;
 	
 	APlayerController* PlayerController = nullptr;
-	FVector MoveDirection;
-	FQuat RotationDirection;
 	bool bIsPlayerAlive = true;
 };
