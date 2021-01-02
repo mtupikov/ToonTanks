@@ -58,4 +58,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* DeathParticle = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float TurretRotationSpeed = 60.0f;
 };

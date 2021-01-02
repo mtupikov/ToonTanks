@@ -34,14 +34,23 @@ APawnBase::APawnBase() {
 
 void APawnBase::BeginPlay() {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("Turret Current Rotation: %s"), *TurretMesh->GetComponentRotation().ToString());
 }
 
 void APawnBase::RotateTurretToTarget(FVector TargetLocation) {
-	const auto LookAtTargetClean = FVector(TargetLocation.X, TargetLocation.Y, TurretMesh->GetComponentLocation().Z);
-	const auto StartLocation = TurretMesh->GetComponentLocation();
-	const auto TurretRotation = FVector(LookAtTargetClean - StartLocation).Rotation();
+	if (TurretRotationSpeed <= 0.0f) {
+		return;
+	}
 
-	TurretMesh->SetWorldRotation(TurretRotation);
+	const auto StartLocation = TurretMesh->GetComponentLocation();
+	const auto LookAtTargetClean = FVector(TargetLocation.X, TargetLocation.Y, StartLocation.Z);
+	const auto DeltaTime = GetWorld()->DeltaTimeSeconds;
+	auto TurretRotator = FRotationMatrix::MakeFromX(LookAtTargetClean - StartLocation).Rotator();
+
+	TurretRotator = FMath::RInterpConstantTo(TurretMesh->GetComponentRotation(), TurretRotator, DeltaTime, TurretRotationSpeed);
+
+	TurretMesh->SetWorldRotation(TurretRotator);
 }
 
 void APawnBase::Fire() {
