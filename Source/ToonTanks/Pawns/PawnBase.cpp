@@ -39,35 +39,23 @@ void APawnBase::BeginPlay() {
 	InitialRotator = TurretMesh->GetComponentRotation();
 }
 
-void APawnBase::RotateTurretToTarget(FVector TargetLocation, float LeftMaxAngle, float RightMaxAngle) {
+void APawnBase::RotateTurretToTarget(
+	FVector TargetLocation,
+	float LeftMaxAngle,
+	float RightMaxAngle,
+	bool IgnoreIfOutOfRange
+) {
 	if (TurretRotationSpeed <= 0.0f) {
 		return;
 	}
 
-	const auto StartLocation = TurretMesh->GetComponentLocation();
-	const auto LookAtTargetClean = FVector(TargetLocation.X, TargetLocation.Y, StartLocation.Z);
-	const auto DeltaTime = GetWorld()->DeltaTimeSeconds;
-	auto TurretRotator = FRotationMatrix::MakeFromX(LookAtTargetClean - StartLocation).Rotator();
-	TurretRotator = FMath::RInterpConstantTo(TurretMesh->GetComponentRotation(), TurretRotator, DeltaTime, TurretRotationSpeed);
-	TurretRotator.Normalize();
-
-	FRotator LeftMaxRotator(InitialRotator);
-	if (LeftMaxAngle != MaximumRotationAngle()) {
-		LeftMaxRotator.Yaw -= LeftMaxAngle;
-		LeftMaxRotator.Normalize();
+	const auto Rotators = RotatorsToLocation(InitialRotator, TargetLocation, LeftMaxAngle, RightMaxAngle);
+	if (IgnoreIfOutOfRange
+		&& !UKismetMathLibrary::InRange_FloatFloat(Rotators.ResultRotator.Yaw, Rotators.LeftMaxRotator.Yaw, Rotators.RightMaxRotator.Yaw, false, false)) {
+		return;
 	}
 
-	FRotator RightMaxRotator(InitialRotator);
-	if (LeftMaxAngle != MaximumRotationAngle()) {
-		RightMaxRotator.Yaw += RightMaxAngle;
-		RightMaxRotator.Normalize();
-	}
-
-	if (LeftMaxRotator != InitialRotator && RightMaxRotator != InitialRotator) {
-		TurretRotator.Yaw = UKismetMathLibrary::ClampAngle(TurretRotator.Yaw, LeftMaxRotator.Yaw, RightMaxRotator.Yaw);
-	}
-
-	TurretMesh->SetWorldRotation(TurretRotator);
+	TurretMesh->SetWorldRotation(Rotators.ResultRotator);
 }
 
 void APawnBase::Fire() {
@@ -79,6 +67,47 @@ void APawnBase::Fire() {
 	const auto SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
 	AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
 	TempProjectile->SetOwner(this);
+}
+
+APawnBase::ResultRotators APawnBase::RotatorsToLocation(
+	FRotator ActorRotator,
+	FVector TargetLocation,
+	float LeftMaxAngle,
+	float RightMaxAngle
+) {
+	const auto StartLocation = GetTurretLocation();
+	const auto LookAtTargetClean = FVector(TargetLocation.X, TargetLocation.Y, StartLocation.Z);
+	const auto DeltaTime = GetWorld()->DeltaTimeSeconds;
+	auto TurretRotator = FRotationMatrix::MakeFromX(LookAtTargetClean - StartLocation).Rotator();
+	TurretRotator = FMath::RInterpConstantTo(GetTurretRotation(), TurretRotator, DeltaTime, TurretRotationSpeed);
+
+	FRotator LeftMaxRotator(ActorRotator);
+	if (LeftMaxAngle != MaximumRotationAngle()) {
+		LeftMaxRotator.Add(0, -LeftMaxAngle, 0);
+	}
+
+	FRotator RightMaxRotator(ActorRotator);
+	if (RightMaxAngle != MaximumRotationAngle()) {
+		RightMaxRotator.Add(0, RightMaxAngle, 0);
+	}
+
+	if (LeftMaxRotator != ActorRotator && RightMaxRotator != ActorRotator) {
+		TurretRotator.Yaw = UKismetMathLibrary::ClampAngle(TurretRotator.Yaw, LeftMaxRotator.Yaw, RightMaxRotator.Yaw);
+	}
+
+	return { TurretRotator, LeftMaxRotator, RightMaxRotator };
+}
+
+FRotator APawnBase::GetTurretRotation() const {
+	return TurretMesh->GetComponentRotation();
+}
+
+FRotator APawnBase::GetTurretInitialRotation() const {
+	return InitialRotator;
+}
+
+FVector APawnBase::GetTurretLocation() const {
+	return TurretMesh->GetComponentLocation();
 }
 
 float APawnBase::MaximumRotationAngle() {

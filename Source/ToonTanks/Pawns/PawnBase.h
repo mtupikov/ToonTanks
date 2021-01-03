@@ -24,17 +24,38 @@ public:
 	virtual void HandleDestruction();
 
 protected:
+	struct ResultRotators {
+		FRotator ResultRotator;
+		FRotator LeftMaxRotator;
+		FRotator RightMaxRotator;
+	};
+
+	static float MaximumRotationAngle();
+	
 	virtual void BeginPlay() override;
-	void RotateTurretToTarget(FVector TargetLocation, float LeftMaxAngle = 180.0f, float RightMaxAngle = 180.0f);
+	void RotateTurretToTarget(
+		FVector TargetLocation,
+		float LeftMaxAngle = 180.0f,
+		float RightMaxAngle = 180.0f,
+		bool IgnoreIfOutOfRange = false
+	);
 	void Fire();
+
+	ResultRotators RotatorsToLocation(
+		FRotator ActorRotator,
+		FVector TargetLocation,
+		float LeftMaxAngle,
+		float RightMaxAngle
+	);
+	FRotator GetTurretRotation() const;
+	FRotator GetTurretInitialRotation() const;
+	FVector GetTurretLocation() const;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	TSubclassOf<UMatineeCameraShake> CameraDeathShake;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UPawnMovementComponentBase* MovementComponent = nullptr;
-
-	static float MaximumRotationAngle();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

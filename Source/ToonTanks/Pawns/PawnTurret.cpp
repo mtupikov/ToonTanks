@@ -1,6 +1,7 @@
 #include "PawnTurret.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "PawnTank.h"
 
@@ -15,7 +16,7 @@ void APawnTurret::Tick(float DeltaTime) {
 		return;
 	}
 
-	RotateTurretToTarget(PlayerPawn->GetTargetLocation(), MaximumLeftRelativeRotation, MaximumRightRelativeRotation);
+	RotateTurretToTarget(PlayerPawn->GetTargetLocation(), MaximumLeftRelativeRotation, MaximumRightRelativeRotation, true);
 }
 
 void APawnTurret::BeginPlay() {
@@ -33,6 +34,16 @@ void APawnTurret::HandleDestruction() {
 
 void APawnTurret::CheckFireCondition() {
 	if (!PlayerPawn) {
+		return;
+	}
+
+	const auto Rotators = RotatorsToLocation(
+		GetTurretInitialRotation(),
+		PlayerPawn->GetTargetLocation(),
+		MaximumLeftRelativeRotation,
+		MaximumRightRelativeRotation
+	);
+	if (!UKismetMathLibrary::InRange_FloatFloat(Rotators.ResultRotator.Yaw, Rotators.LeftMaxRotator.Yaw, Rotators.RightMaxRotator.Yaw, false, false)) {
 		return;
 	}
 
