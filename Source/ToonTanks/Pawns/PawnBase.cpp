@@ -40,7 +40,7 @@ void APawnBase::BeginPlay() {
 }
 
 void APawnBase::RotateTurretToTarget(
-	FVector TargetLocation,
+	const FVector& TargetLocation,
 	float LeftMaxAngle,
 	float RightMaxAngle,
 	bool IgnoreIfOutOfRange
@@ -69,13 +69,13 @@ void APawnBase::Fire() {
 	TempProjectile->SetOwner(this);
 }
 
-void APawnBase::RotateTurret(FRotator Rotation) {
+void APawnBase::RotateTurret(const FRotator& Rotation) {
 	TurretMesh->SetWorldRotation(Rotation);
 }
 
 APawnBase::ResultRotators APawnBase::RotatorsToLocation(
-	FRotator ActorRotator,
-	FVector TargetLocation,
+	const FRotator& ActorRotator,
+	const FVector& TargetLocation,
 	float LeftMaxAngle,
 	float RightMaxAngle
 ) {

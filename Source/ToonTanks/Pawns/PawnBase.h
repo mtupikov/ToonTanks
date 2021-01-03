@@ -34,17 +34,17 @@ protected:
 	
 	virtual void BeginPlay() override;
 	void RotateTurretToTarget(
-		FVector TargetLocation,
+		const FVector& TargetLocation,
 		float LeftMaxAngle = 180.0f,
 		float RightMaxAngle = 180.0f,
 		bool IgnoreIfOutOfRange = false
 	);
 	void Fire();
-	void RotateTurret(FRotator Rotation);
+	void RotateTurret(const FRotator& Rotation);
 
 	ResultRotators RotatorsToLocation(
-		FRotator ActorRotator,
-		FVector TargetLocation,
+		const FRotator& ActorRotator,
+		const FVector& TargetLocation,
 		float LeftMaxAngle,
 		float RightMaxAngle
 	);

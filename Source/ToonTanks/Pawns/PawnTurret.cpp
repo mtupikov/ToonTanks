@@ -5,9 +5,7 @@
 
 #include "PawnTank.h"
 
-APawnTurret::APawnTurret() {
-	
-}
+APawnTurret::APawnTurret() {}
 
 void APawnTurret::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
