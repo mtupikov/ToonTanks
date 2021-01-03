@@ -55,7 +55,7 @@ void APawnBase::RotateTurretToTarget(
 		return;
 	}
 
-	TurretMesh->SetWorldRotation(Rotators.ResultRotator);
+	RotateTurret(Rotators.ResultRotator);
 }
 
 void APawnBase::Fire() {
@@ -67,6 +67,10 @@ void APawnBase::Fire() {
 	const auto SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
 	AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
 	TempProjectile->SetOwner(this);
+}
+
+void APawnBase::RotateTurret(FRotator Rotation) {
+	TurretMesh->SetWorldRotation(Rotation);
 }
 
 APawnBase::ResultRotators APawnBase::RotatorsToLocation(

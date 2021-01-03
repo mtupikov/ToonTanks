@@ -22,6 +22,7 @@ protected:
 private:
 	void CheckFireCondition();
 	void SelectPlayerPawn();
+	void RotateIdle();
 	float ReturnDistanceToPlayer();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
@@ -36,6 +37,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float MaximumRightRelativeRotation = APawnBase::MaximumRotationAngle(); // must be 0 <= x <= 180
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float IdleRotationSpeed = 30.0f;
+
 	FTimerHandle FireRateTimerHandle;
 	APawnTank* PlayerPawn = nullptr;
+	bool bIsIdleRotatingLeft = true;
 };

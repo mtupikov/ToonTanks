@@ -40,6 +40,7 @@ protected:
 		bool IgnoreIfOutOfRange = false
 	);
 	void Fire();
+	void RotateTurret(FRotator Rotation);
 
 	ResultRotators RotatorsToLocation(
 		FRotator ActorRotator,
