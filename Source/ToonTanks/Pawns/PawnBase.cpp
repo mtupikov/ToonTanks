@@ -12,14 +12,8 @@
 APawnBase::APawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
 
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
-	RootComponent = CapsuleComponent;
-	CapsuleComponent->SetCapsuleHalfHeight(70);
-	CapsuleComponent->SetCapsuleRadius(70);
-	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
-
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	BaseMesh->SetupAttachment(RootComponent);
+	RootComponent = BaseMesh;
 
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
 	TurretMesh->SetupAttachment(BaseMesh);
