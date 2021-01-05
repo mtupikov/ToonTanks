@@ -49,6 +49,15 @@ void APawnTank::MoveForward(float Value) {
 	}
 }
 
+void APawnTank::CheckFire() {
+	if (GetWorld()->GetTimerManager().IsTimerActive(FireRateTimerHandle)) {
+		return;
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, FireRate, false);
+	Fire();
+}
+
 void APawnTank::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
@@ -66,5 +75,5 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::MoveForward);
 	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::Rotate);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::CheckFire);
 }

@@ -26,6 +26,7 @@ protected:
 private:
 	void Rotate(float Value);
 	void MoveForward(float Value);
+	void CheckFire();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent = nullptr;
@@ -39,6 +40,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float RotateSpeed = 200.0f;
 	
+	FTimerHandle FireRateTimerHandle;
 	APlayerController* PlayerController = nullptr;
 	bool bIsPlayerAlive = true;
 };
