@@ -1,14 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PawnBase.h"
+#include "PawnWithProjectileBase.h"
 #include "PawnTank.generated.h"
 
+class UMatineeCameraShake;
 class USpringArmComponent;
 class UCameraComponent;
 
 UCLASS()
-class TOONTANKS_API APawnTank : public APawnBase {
+class TOONTANKS_API APawnTank : public APawnWithProjectileBase {
 	GENERATED_BODY()
 
 public:
@@ -34,6 +35,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent = nullptr;
 	
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	TSubclassOf<UMatineeCameraShake> CameraDeathShake;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float MoveSpeed = 400.0f;
 

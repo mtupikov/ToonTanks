@@ -1,11 +1,9 @@
 #include "PawnBase.h"
 
-#include "Camera/CameraShake.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "ToonTanks/Actors/ProjectileBase.h"
 #include "ToonTanks/Components/HealthComponent.h"
 #include "ToonTanks/Components/PawnMovementComponentBase.h"
 
@@ -18,8 +16,8 @@ APawnBase::APawnBase() {
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
 	TurretMesh->SetupAttachment(BaseMesh);
 
-	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
-	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+	FireSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
+	FireSpawnPoint->SetupAttachment(TurretMesh);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
@@ -52,15 +50,20 @@ void APawnBase::RotateTurretToTarget(
 	RotateTurret(Rotators.ResultRotator);
 }
 
-void APawnBase::Fire() {
-	if (!ProjectileClass || !TurretMesh) {
-		return;
-	}
-	
-	const auto SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
-	const auto SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
-	AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
-	TempProjectile->SetOwner(this);
+float APawnBase::GetFireRate() const {
+	return FireRate;
+}
+
+UStaticMeshComponent* APawnBase::GetTurretMesh() const {
+	return TurretMesh;
+}
+
+USceneComponent* APawnBase::GetFireSpawnPoint() const {
+	return FireSpawnPoint;
+}
+
+UPawnMovementComponentBase* APawnBase::GetPawnMovementComponent() const {
+	return MovementComponent;
 }
 
 void APawnBase::RotateTurret(const FRotator& Rotation) {
@@ -96,6 +99,8 @@ APawnBase::ResultRotators APawnBase::RotatorsToLocation(
 	return { TurretRotator, LeftMaxRotator, RightMaxRotator };
 }
 
+void APawnBase::Fire() {}
+
 FRotator APawnBase::GetTurretRotation() const {
 	return TurretMesh->GetComponentRotation();
 }
@@ -109,7 +114,7 @@ FVector APawnBase::GetTurretLocation() const {
 }
 
 float APawnBase::MaximumRotationAngle() {
-	return 180.0f;
+	return 90.0f;
 }
 
 void APawnBase::HandleDestruction() {

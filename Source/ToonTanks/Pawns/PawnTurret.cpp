@@ -21,7 +21,7 @@ void APawnTurret::Tick(float DeltaTime) {
 void APawnTurret::BeginPlay() {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &APawnTurret::CheckFireCondition, FireRate, true);
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &APawnTurret::CheckFireCondition, GetFireRate(), true);
 	SelectPlayerPawn();
 }
 

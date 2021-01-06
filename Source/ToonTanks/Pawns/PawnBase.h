@@ -4,9 +4,6 @@
 #include "GameFramework/Pawn.h"
 #include "PawnBase.generated.h"
 
-class AProjectileBase;
-class UMatineeCameraShake;
-class UCapsuleComponent;
 class UPawnMovementComponentBase;
 class USceneComponent;
 class UStaticMeshComponent;
@@ -23,6 +20,17 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void HandleDestruction();
 
+	static float MaximumRotationAngle();
+
+	float GetFireRate() const;
+	UStaticMeshComponent* GetTurretMesh() const;
+	USceneComponent* GetFireSpawnPoint() const;
+	UPawnMovementComponentBase* GetPawnMovementComponent() const;
+
+	FRotator GetTurretRotation() const;
+	FRotator GetTurretInitialRotation() const;
+	FVector GetTurretLocation() const;
+
 protected:
 	struct ResultRotators {
 		FRotator ResultRotator;
@@ -30,16 +38,13 @@ protected:
 		FRotator RightMaxRotator;
 	};
 
-	static float MaximumRotationAngle();
-	
 	virtual void BeginPlay() override;
 	void RotateTurretToTarget(
 		const FVector& TargetLocation,
-		float LeftMaxAngle = 180.0f,
-		float RightMaxAngle = 180.0f,
+		float LeftMaxAngle = APawnBase::MaximumRotationAngle(),
+		float RightMaxAngle = APawnBase::MaximumRotationAngle(),
 		bool IgnoreIfOutOfRange = false
 	);
-	void Fire();
 	void RotateTurret(const FRotator& Rotation);
 
 	ResultRotators RotatorsToLocation(
@@ -48,23 +53,10 @@ protected:
 		float LeftMaxAngle,
 		float RightMaxAngle
 	);
-	FRotator GetTurretRotation() const;
-	FRotator GetTurretInitialRotation() const;
-	FVector GetTurretLocation() const;
 
-	UPROPERTY(EditAnywhere, Category = "Effects")
-	TSubclassOf<UMatineeCameraShake> CameraDeathShake;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UPawnMovementComponentBase* MovementComponent = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	float FireRate = 2.0f;
+	virtual void Fire();
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UCapsuleComponent* CapsuleComponent = nullptr;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BaseMesh = nullptr;
 
@@ -72,13 +64,13 @@ private:
 	UStaticMeshComponent* TurretMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	USceneComponent* ProjectileSpawnPoint = nullptr;
+	USceneComponent* FireSpawnPoint = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AProjectileBase> ProjectileClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPawnMovementComponentBase* MovementComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound = nullptr;
@@ -88,6 +80,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float TurretRotationSpeed = 60.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float FireRate = 2.0f;
 
 	FRotator InitialRotator;
 };

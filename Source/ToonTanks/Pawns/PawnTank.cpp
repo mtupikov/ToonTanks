@@ -2,6 +2,7 @@
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Camera/CameraShake.h"
 
 #include "ToonTanks/Components/PawnMovementComponentBase.h"
 
@@ -18,8 +19,8 @@ void APawnTank::BeginPlay() {
 
 	PlayerController = Cast<APlayerController>(GetController());
 
-	if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent)) {
-		MovementComponent->SetMoveSpeed(MoveSpeed);
+	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
+		GetPawnMovementComponent()->SetMoveSpeed(MoveSpeed);
 	}
 }
 
@@ -44,8 +45,8 @@ void APawnTank::Rotate(float Value) {
 }
 
 void APawnTank::MoveForward(float Value) {
-	if (MovementComponent && (MovementComponent->UpdatedComponent == RootComponent)) {
-		MovementComponent->AddInputVector(GetActorForwardVector() * Value);
+	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
+		GetPawnMovementComponent()->AddInputVector(GetActorForwardVector() * Value);
 	}
 }
 
@@ -54,7 +55,7 @@ void APawnTank::CheckFire() {
 		return;
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, FireRate, false);
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, GetFireRate(), false);
 	Fire();
 }
 

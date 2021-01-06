@@ -1,13 +1,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PawnBase.h"
+#include "PawnWithProjectileBase.h"
 #include "PawnTurret.generated.h"
 
 class APawnTank;
 
 UCLASS()
-class TOONTANKS_API APawnTurret : public APawnBase {
+class TOONTANKS_API APawnTurret : public APawnWithProjectileBase {
 	GENERATED_BODY()
 
 public:
@@ -29,10 +29,10 @@ private:
 	float FireRange = 700.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	float MaximumLeftRelativeRotation = APawnBase::MaximumRotationAngle(); // must be 0 <= x <= 180
+	float MaximumLeftRelativeRotation = APawnBase::MaximumRotationAngle();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	float MaximumRightRelativeRotation = APawnBase::MaximumRotationAngle(); // must be 0 <= x <= 180
+	float MaximumRightRelativeRotation = APawnBase::MaximumRotationAngle();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float IdleRotationSpeed = 30.0f;
