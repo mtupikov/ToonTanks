@@ -3,8 +3,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "PawnTank.h"
-
 APawnTurret::APawnTurret() {}
 
 void APawnTurret::Tick(float DeltaTime) {
@@ -57,7 +55,7 @@ void APawnTurret::SelectPlayerPawn() {
 		return;
 	}
 
-	PlayerPawn = Cast<APawnTank>(PlayerRawPawn);
+	PlayerPawn = Cast<APawnBase>(PlayerRawPawn);
 }
 
 void APawnTurret::RotateIdle() {

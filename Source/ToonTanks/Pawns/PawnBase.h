@@ -23,6 +23,10 @@ public:
 	static float MaximumRotationAngle();
 
 	float GetFireRate() const;
+
+	bool IsAlive() const;
+	void SetIsAlive(bool Value);
+
 	UStaticMeshComponent* GetTurretMesh() const;
 	USceneComponent* GetFireSpawnPoint() const;
 	UPawnMovementComponentBase* GetPawnMovementComponent() const;
@@ -85,4 +89,5 @@ private:
 	float FireRate = 2.0f;
 
 	FRotator InitialRotator;
+	bool bIsPawnAlive = true;
 };

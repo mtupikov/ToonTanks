@@ -4,7 +4,7 @@
 #include "PawnWithProjectileBase.h"
 #include "PawnTurret.generated.h"
 
-class APawnTank;
+class ATankWithProjectile;
 
 UCLASS()
 class TOONTANKS_API APawnTurret : public APawnWithProjectileBase {
@@ -38,6 +38,6 @@ private:
 	float IdleRotationSpeed = 30.0f;
 
 	FTimerHandle FireRateTimerHandle;
-	APawnTank* PlayerPawn = nullptr;
+	APawnBase* PlayerPawn = nullptr;
 	bool bIsIdleRotatingLeft = true;
 };

@@ -31,6 +31,16 @@ void APawnBase::BeginPlay() {
 	InitialRotator = TurretMesh->GetComponentRotation();
 }
 
+bool APawnBase::IsAlive() const {
+	return bIsPawnAlive;
+}
+
+void APawnBase::SetIsAlive(bool Value) {
+	if (bIsPawnAlive != Value) {
+		bIsPawnAlive = Value;
+	}
+}
+
 void APawnBase::RotateTurretToTarget(
 	const FVector& TargetLocation,
 	float LeftMaxAngle,

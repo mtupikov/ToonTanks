@@ -4,8 +4,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "TankGameModeBase.generated.h"
 
-class APawnTank;
-class APawnTurret;
+class APawnBase;
 class APlayerControllerBase;
 
 UCLASS()
@@ -34,6 +33,6 @@ private:
 	int32 StartDelay = 3;
 
 	APlayerControllerBase* PlayerController = nullptr;
-	APawnTank* PlayerTank = nullptr;
+	APawnBase* PlayerTank = nullptr;
 	uint32 TargetTurretsCount = 0;
 };

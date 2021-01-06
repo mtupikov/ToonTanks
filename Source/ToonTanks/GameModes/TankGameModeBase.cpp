@@ -1,6 +1,6 @@
 #include "TankGameModeBase.h"
 
-#include "ToonTanks/Pawns/PawnTank.h"
+#include "ToonTanks/Pawns/PawnBase.h"
 #include "ToonTanks/Pawns/PawnTurret.h"
 #include "ToonTanks/Controllers/PlayerControllerBase.h"
 
@@ -16,7 +16,7 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor) {
 		if (PlayerController) {
 			PlayerController->SetPlayerEnabledState(false);
 		}
-	} else if (APawnTurret* DestroyedTurret = Cast<APawnTurret>(DeadActor)) {
+	} else if (APawnBase* DestroyedTurret = Cast<APawnBase>(DeadActor)) {
 		DestroyedTurret->HandleDestruction();
 		TargetTurretsCount -= 1;
 
@@ -35,7 +35,7 @@ void ATankGameModeBase::HandleGameStart() {
 	TArray<AActor*> TurretActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawnTurret::StaticClass(), TurretActors);
 	TargetTurretsCount = TurretActors.Num();
-	PlayerTank = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+	PlayerTank = Cast<APawnBase>(UGameplayStatics::GetPlayerPawn(this, 0));
 	PlayerController = Cast<APlayerControllerBase>(UGameplayStatics::GetPlayerController(this, 0));
 
 	GameStart();

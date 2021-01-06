@@ -2,24 +2,22 @@
 
 #include "CoreMinimal.h"
 #include "PawnWithProjectileBase.h"
-#include "PawnTank.generated.h"
+#include "TankWithProjectile.generated.h"
 
 class UMatineeCameraShake;
 class USpringArmComponent;
 class UCameraComponent;
 
 UCLASS()
-class TOONTANKS_API APawnTank : public APawnWithProjectileBase {
+class TOONTANKS_API ATankWithProjectile : public APawnWithProjectileBase {
 	GENERATED_BODY()
 
 public:
-	APawnTank();
+	ATankWithProjectile();
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void HandleDestruction() override;
-
-	bool IsAlive() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -46,5 +44,4 @@ private:
 	
 	FTimerHandle FireRateTimerHandle;
 	APlayerController* PlayerController = nullptr;
-	bool bIsPlayerAlive = true;
 };
