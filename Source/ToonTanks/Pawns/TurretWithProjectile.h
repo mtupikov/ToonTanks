@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "PawnWithProjectileBase.h"
-#include "PawnTurret.generated.h"
+#include "TurretWithProjectile.generated.h"
 
 class ATankWithProjectile;
 
 UCLASS()
-class TOONTANKS_API APawnTurret : public APawnWithProjectileBase {
+class TOONTANKS_API ATurretWithProjectile : public APawnWithProjectileBase {
 	GENERATED_BODY()
 
 public:
-	APawnTurret();
+	ATurretWithProjectile();
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void HandleDestruction() override;

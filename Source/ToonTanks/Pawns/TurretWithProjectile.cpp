@@ -1,11 +1,11 @@
-#include "PawnTurret.h"
+#include "TurretWithProjectile.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-APawnTurret::APawnTurret() {}
+ATurretWithProjectile::ATurretWithProjectile() {}
 
-void APawnTurret::Tick(float DeltaTime) {
+void ATurretWithProjectile::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 	if (!PlayerPawn || ReturnDistanceToPlayer() > FireRange || !PlayerPawn->IsAlive()) {
@@ -16,20 +16,20 @@ void APawnTurret::Tick(float DeltaTime) {
 	RotateTurretToTarget(PlayerPawn->GetTargetLocation(), MaximumLeftRelativeRotation, MaximumRightRelativeRotation, true);
 }
 
-void APawnTurret::BeginPlay() {
+void ATurretWithProjectile::BeginPlay() {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &APawnTurret::CheckFireCondition, GetFireRate(), true);
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATurretWithProjectile::CheckFireCondition, GetFireRate(), true);
 	SelectPlayerPawn();
 }
 
-void APawnTurret::HandleDestruction() {
+void ATurretWithProjectile::HandleDestruction() {
 	Super::HandleDestruction();
 
 	Destroy();
 }
 
-void APawnTurret::CheckFireCondition() {
+void ATurretWithProjectile::CheckFireCondition() {
 	if (!PlayerPawn) {
 		return;
 	}
@@ -49,7 +49,7 @@ void APawnTurret::CheckFireCondition() {
 	}
 }
 
-void APawnTurret::SelectPlayerPawn() {
+void ATurretWithProjectile::SelectPlayerPawn() {
 	auto* PlayerRawPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	if (!PlayerRawPawn) {
 		return;
@@ -58,7 +58,7 @@ void APawnTurret::SelectPlayerPawn() {
 	PlayerPawn = Cast<APawnBase>(PlayerRawPawn);
 }
 
-void APawnTurret::RotateIdle() {
+void ATurretWithProjectile::RotateIdle() {
 	const auto LeftMax = GetTurretInitialRotation().Add(0, -MaximumLeftRelativeRotation, 0).GetNormalized();
 	const auto RightMax = GetTurretInitialRotation().Add(0, MaximumRightRelativeRotation, 0).GetNormalized();
 	const auto CurrentYaw = GetTurretRotation().Yaw;
@@ -79,7 +79,7 @@ void APawnTurret::RotateIdle() {
 	}
 }
 
-float APawnTurret::ReturnDistanceToPlayer() {
+float ATurretWithProjectile::ReturnDistanceToPlayer() {
 	if (!PlayerPawn) {
 		return 0.0f;
 	}
