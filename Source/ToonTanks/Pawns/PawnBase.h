@@ -4,10 +4,19 @@
 #include "GameFramework/Pawn.h"
 #include "PawnBase.generated.h"
 
+class AProjectileBase;
 class UPawnMovementComponentBase;
 class USceneComponent;
 class UStaticMeshComponent;
 class UHealthComponent;
+class UShootComponent;
+
+UENUM()
+enum class EShootType : uint8 {
+	None             UMETA(DisplayName = "None"),
+	TraceBullet      UMETA(DisplayName = "Trace Bullet"),
+	ProjectileRocket UMETA(DisplayName = "Projectile Rocket")
+};
 
 UCLASS()
 class TOONTANKS_API APawnBase : public APawn {
@@ -76,11 +85,20 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UPawnMovementComponentBase* MovementComponent = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UShootComponent* ShootComponent = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* DeathParticle = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AProjectileBase> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	EShootType ShootType = EShootType::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float TurretRotationSpeed = 60.0f;

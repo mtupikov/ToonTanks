@@ -1,19 +1,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PawnWithProjectileBase.h"
-#include "TankWithProjectile.generated.h"
+#include "PawnBase.h"
+#include "TankBase.generated.h"
 
 class UMatineeCameraShake;
 class USpringArmComponent;
 class UCameraComponent;
 
 UCLASS()
-class TOONTANKS_API ATankWithProjectile : public APawnWithProjectileBase {
+class TOONTANKS_API ATankBase : public APawnBase {
 	GENERATED_BODY()
 
 public:
-	ATankWithProjectile();
+	ATankBase();
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -32,7 +32,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	TSubclassOf<UMatineeCameraShake> CameraDeathShake;
 
@@ -41,7 +41,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float RotateSpeed = 200.0f;
-	
+
 	FTimerHandle FireRateTimerHandle;
 	APlayerController* PlayerController = nullptr;
 };

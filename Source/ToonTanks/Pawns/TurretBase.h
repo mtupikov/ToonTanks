@@ -1,17 +1,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PawnWithProjectileBase.h"
-#include "TurretWithProjectile.generated.h"
+#include "PawnBase.h"
+#include "TurretBase.generated.h"
 
-class ATankWithProjectile;
+class ATankBase;
 
 UCLASS()
-class TOONTANKS_API ATurretWithProjectile : public APawnWithProjectileBase {
+class TOONTANKS_API ATurretBase : public APawnBase {
 	GENERATED_BODY()
 
 public:
-	ATurretWithProjectile();
+	ATurretBase();
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void HandleDestruction() override;
@@ -38,6 +38,6 @@ private:
 	float IdleRotationSpeed = 30.0f;
 
 	FTimerHandle FireRateTimerHandle;
-	APawnBase* PlayerPawn = nullptr;
+	ATankBase* PlayerPawn = nullptr;
 	bool bIsIdleRotatingLeft = true;
 };

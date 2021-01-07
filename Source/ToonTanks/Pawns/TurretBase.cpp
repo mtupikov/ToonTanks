@@ -1,12 +1,14 @@
-#include "TurretWithProjectile.h"
+#include "TurretBase.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-ATurretWithProjectile::ATurretWithProjectile() {}
+#include "ToonTanks/Pawns/TankBase.h"
 
-void ATurretWithProjectile::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
+ATurretBase::ATurretBase() {}
+
+void ATurretBase::Tick(float DeltaTime) {
+	APawnBase::Tick(DeltaTime);
 
 	if (!PlayerPawn || ReturnDistanceToPlayer() > FireRange || !PlayerPawn->IsAlive()) {
 		RotateIdle();
@@ -16,20 +18,20 @@ void ATurretWithProjectile::Tick(float DeltaTime) {
 	RotateTurretToTarget(PlayerPawn->GetTargetLocation(), MaximumLeftRelativeRotation, MaximumRightRelativeRotation, true);
 }
 
-void ATurretWithProjectile::BeginPlay() {
-	Super::BeginPlay();
+void ATurretBase::BeginPlay() {
+	APawnBase::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATurretWithProjectile::CheckFireCondition, GetFireRate(), true);
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATurretBase::CheckFireCondition, GetFireRate(), true);
 	SelectPlayerPawn();
 }
 
-void ATurretWithProjectile::HandleDestruction() {
-	Super::HandleDestruction();
+void ATurretBase::HandleDestruction() {
+	APawnBase::HandleDestruction();
 
 	Destroy();
 }
 
-void ATurretWithProjectile::CheckFireCondition() {
+void ATurretBase::CheckFireCondition() {
 	if (!PlayerPawn) {
 		return;
 	}
@@ -49,16 +51,16 @@ void ATurretWithProjectile::CheckFireCondition() {
 	}
 }
 
-void ATurretWithProjectile::SelectPlayerPawn() {
+void ATurretBase::SelectPlayerPawn() {
 	auto* PlayerRawPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	if (!PlayerRawPawn) {
 		return;
 	}
 
-	PlayerPawn = Cast<APawnBase>(PlayerRawPawn);
+	PlayerPawn = Cast<ATankBase>(PlayerRawPawn);
 }
 
-void ATurretWithProjectile::RotateIdle() {
+void ATurretBase::RotateIdle() {
 	const auto LeftMax = GetTurretInitialRotation().Add(0, -MaximumLeftRelativeRotation, 0).GetNormalized();
 	const auto RightMax = GetTurretInitialRotation().Add(0, MaximumRightRelativeRotation, 0).GetNormalized();
 	const auto CurrentYaw = GetTurretRotation().Yaw;
@@ -79,7 +81,7 @@ void ATurretWithProjectile::RotateIdle() {
 	}
 }
 
-float ATurretWithProjectile::ReturnDistanceToPlayer() {
+float ATurretBase::ReturnDistanceToPlayer() {
 	if (!PlayerPawn) {
 		return 0.0f;
 	}

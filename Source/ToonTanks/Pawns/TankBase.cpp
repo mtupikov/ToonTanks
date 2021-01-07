@@ -1,4 +1,4 @@
-#include "TankWithProjectile.h"
+#include "TankBase.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -6,7 +6,7 @@
 
 #include "ToonTanks/Components/PawnMovementComponentBase.h"
 
-ATankWithProjectile::ATankWithProjectile() {
+ATankBase::ATankBase() {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArmComponent->SetupAttachment(RootComponent);
 
@@ -14,8 +14,8 @@ ATankWithProjectile::ATankWithProjectile() {
 	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
-void ATankWithProjectile::BeginPlay() {
-	Super::BeginPlay();
+void ATankBase::BeginPlay() {
+	APawnBase::BeginPlay();
 
 	PlayerController = Cast<APlayerController>(GetController());
 
@@ -24,8 +24,8 @@ void ATankWithProjectile::BeginPlay() {
 	}
 }
 
-void ATankWithProjectile::HandleDestruction() {
-	Super::HandleDestruction();
+void ATankBase::HandleDestruction() {
+	APawnBase::HandleDestruction();
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraDeathShake);
 
 	SetIsAlive(false);
@@ -33,19 +33,19 @@ void ATankWithProjectile::HandleDestruction() {
 	SetActorTickEnabled(false);
 }
 
-void ATankWithProjectile::Rotate(float Value) {
+void ATankBase::Rotate(float Value) {
 	const float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
 	const auto Rotation = FRotator(0, RotateAmount, 0);
 	AddActorLocalRotation(FQuat(Rotation), true);
 }
 
-void ATankWithProjectile::MoveForward(float Value) {
+void ATankBase::MoveForward(float Value) {
 	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
 		GetPawnMovementComponent()->AddInputVector(GetActorForwardVector() * Value);
 	}
 }
 
-void ATankWithProjectile::CheckFire() {
+void ATankBase::CheckFire() {
 	if (GetWorld()->GetTimerManager().IsTimerActive(FireRateTimerHandle)) {
 		return;
 	}
@@ -54,8 +54,8 @@ void ATankWithProjectile::CheckFire() {
 	Fire();
 }
 
-void ATankWithProjectile::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
+void ATankBase::Tick(float DeltaTime) {
+	APawnBase::Tick(DeltaTime);
 
 	if (PlayerController) {
 		FHitResult TraceHitResult;
@@ -66,10 +66,10 @@ void ATankWithProjectile::Tick(float DeltaTime) {
 	}
 }
 
-void ATankWithProjectile::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
+void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &ATankWithProjectile::MoveForward);
-	PlayerInputComponent->BindAxis("Turn", this, &ATankWithProjectile::Rotate);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankWithProjectile::CheckFire);
+	PlayerInputComponent->BindAxis("MoveForward", this, &ATankBase::MoveForward);
+	PlayerInputComponent->BindAxis("Turn", this, &ATankBase::Rotate);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::CheckFire);
 }

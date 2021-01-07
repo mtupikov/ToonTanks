@@ -4,8 +4,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "ToonTanks/Actors/ProjectileBase.h"
 #include "ToonTanks/Components/HealthComponent.h"
 #include "ToonTanks/Components/PawnMovementComponentBase.h"
+#include "ToonTanks/Components/ShootProjectileComponent.h"
+#include "ToonTanks/Components/ShootTraceComponent.h"
 
 APawnBase::APawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -29,6 +32,25 @@ void APawnBase::BeginPlay() {
 	Super::BeginPlay();
 
 	InitialRotator = TurretMesh->GetComponentRotation();
+
+	switch (ShootType) {
+	case EShootType::ProjectileRocket: {
+		ShootComponent = NewObject<UShootProjectileComponent>(this, UShootProjectileComponent::StaticClass(), TEXT("Shoot Projectile Component"));
+		break;
+	}
+	case EShootType::TraceBullet: {
+		ShootComponent = NewObject<UShootTraceComponent>(this, UShootTraceComponent::StaticClass(), TEXT("Shoot Trace Bullet Component"));
+		break;
+	}
+	}
+
+	if (ShootComponent) {
+		ShootComponent->RegisterComponent();
+
+		if (auto* SPC = Cast<UShootProjectileComponent>(ShootComponent)) {
+			SPC->SetProjectile(ProjectileClass);
+		}
+	}
 }
 
 bool APawnBase::IsAlive() const {
@@ -109,7 +131,14 @@ APawnBase::ResultRotators APawnBase::RotatorsToLocation(
 	return { TurretRotator, LeftMaxRotator, RightMaxRotator };
 }
 
-void APawnBase::Fire() {}
+void APawnBase::Fire() {
+	if (!ShootComponent) {
+		UE_LOG(LogTemp, Warning, TEXT("Cannot fire, ShootComponent is null"), *GetName());
+		return;
+	}
+
+	ShootComponent->Fire(FireSpawnPoint->GetComponentLocation(), FireSpawnPoint->GetComponentRotation(), this);
+}
 
 FRotator APawnBase::GetTurretRotation() const {
 	return TurretMesh->GetComponentRotation();
