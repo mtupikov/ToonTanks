@@ -17,7 +17,6 @@ AProjectileBase::AProjectileBase() {
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->InitialSpeed = MovementSpeed;
 	ProjectileMovement->MaxSpeed = MovementSpeed;
-	InitialLifeSpan = 3.0f;
 
 	TrailParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Trail Particle"));
 	TrailParticle->SetupAttachment(RootComponent);
@@ -27,6 +26,18 @@ void AProjectileBase::BeginPlay() {
 	Super::BeginPlay();
 
 	UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
+	GetWorld()->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::BlowUp, LifeSpanTime, false);
+}
+
+void AProjectileBase::SetHomingTarget(USceneComponent* Target) {
+	ProjectileMovement->HomingTargetComponent = Target;
+	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->bShouldBounce = false;
+	ProjectileMovement->bInitialVelocityInLocalSpace = true;
+	ProjectileMovement->bIsHomingProjectile = true;
+	ProjectileMovement->ProjectileGravityScale = 0.05f;
+
+	LifeSpanTime = 7.0f;
 }
 
 void AProjectileBase::OnHit(
@@ -45,10 +56,16 @@ void AProjectileBase::OnHit(
 		return;
 	}
 
-	UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
-	UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
+	GetWorld()->GetTimerManager().ClearTimer(LifeSpanTimerHandle);
+
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraHitShake);
 
+	BlowUp();
+}
+
+void AProjectileBase::BlowUp() {
+	UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
 	Destroy();
 }

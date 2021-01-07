@@ -16,6 +16,8 @@ class TOONTANKS_API AProjectileBase : public AActor {
 public:
 	AProjectileBase();
 
+	void SetHomingTarget(USceneComponent* Target);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -29,14 +31,13 @@ private:
 		const FHitResult& Hit
 	);
 
+	void BlowUp();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ProjectileMesh = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	TSubclassOf<UMatineeCameraShake> CameraHitShake;
@@ -53,9 +54,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* LaunchSound = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UDamageType> DamageType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	float Damage = 50.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float MovementSpeed = 1300.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float LifeSpanTime = 3.0;
+	
+	FTimerHandle LifeSpanTimerHandle;
 };

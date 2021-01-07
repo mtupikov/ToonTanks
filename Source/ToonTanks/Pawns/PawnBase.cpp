@@ -98,6 +98,10 @@ UPawnMovementComponentBase* APawnBase::GetPawnMovementComponent() const {
 	return MovementComponent;
 }
 
+UShootComponent* APawnBase::GetShootComponent() const {
+	return ShootComponent;
+}
+
 void APawnBase::RotateTurret(const FRotator& Rotation) {
 	TurretMesh->SetWorldRotation(Rotation);
 }
@@ -131,13 +135,13 @@ APawnBase::ResultRotators APawnBase::RotatorsToLocation(
 	return { TurretRotator, LeftMaxRotator, RightMaxRotator };
 }
 
-void APawnBase::Fire() {
+void APawnBase::Fire(USceneComponent* Target) {
 	if (!ShootComponent) {
 		UE_LOG(LogTemp, Warning, TEXT("Cannot fire, ShootComponent is null"), *GetName());
 		return;
 	}
 
-	ShootComponent->Fire(FireSpawnPoint->GetComponentLocation(), FireSpawnPoint->GetComponentRotation(), this);
+	ShootComponent->Fire(FireSpawnPoint->GetComponentLocation(), FireSpawnPoint->GetComponentRotation(), this, Target);
 }
 
 FRotator APawnBase::GetTurretRotation() const {

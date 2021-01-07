@@ -9,5 +9,5 @@ class TOONTANKS_API UShootComponent : public UActorComponent {
 	GENERATED_BODY()
 
 public:
-	virtual void Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner);
+	virtual void Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target = nullptr);
 };

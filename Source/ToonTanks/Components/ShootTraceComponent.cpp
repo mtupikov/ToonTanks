@@ -2,7 +2,7 @@
 
 #include "DrawDebugHelpers.h"
 
-void UShootTraceComponent::Fire(const FVector& SpawnLocation, const FRotator&, AActor* Owner) {
+void UShootTraceComponent::Fire(const FVector& SpawnLocation, const FRotator&, AActor* Owner, USceneComponent*) {
 	FHitResult OutHit;
 	const auto& Start = SpawnLocation;
 	const auto End = ((FVector::ForwardVector * 1000.f) + Start);

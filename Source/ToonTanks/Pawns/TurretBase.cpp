@@ -4,6 +4,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "ToonTanks/Pawns/TankBase.h"
+#include "ToonTanks/Components/ShootProjectileComponent.h"
 
 ATurretBase::ATurretBase() {}
 
@@ -23,6 +24,10 @@ void ATurretBase::BeginPlay() {
 
 	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATurretBase::CheckFireCondition, GetFireRate(), true);
 	SelectPlayerPawn();
+
+	if (auto* ProjectileShootComponent = Cast<UShootProjectileComponent>(GetShootComponent())) {
+		ProjectileShootComponent->SetProjectileIsHoming(bHasHomingProjectile);
+	}
 }
 
 void ATurretBase::HandleDestruction() {
@@ -47,7 +52,7 @@ void ATurretBase::CheckFireCondition() {
 	}
 
 	if (ReturnDistanceToPlayer() <= FireRange && PlayerPawn->IsAlive()) {
-		Fire();
+		Fire(PlayerPawn->GetTurretMesh());
 	}
 }
 

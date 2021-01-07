@@ -37,6 +37,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float IdleRotationSpeed = 30.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	bool bHasHomingProjectile = false;
+
 	FTimerHandle FireRateTimerHandle;
 	ATankBase* PlayerPawn = nullptr;
 	bool bIsIdleRotatingLeft = true;

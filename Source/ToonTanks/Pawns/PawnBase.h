@@ -13,9 +13,10 @@ class UShootComponent;
 
 UENUM()
 enum class EShootType : uint8 {
-	None             UMETA(DisplayName = "None"),
-	TraceBullet      UMETA(DisplayName = "Trace Bullet"),
-	ProjectileRocket UMETA(DisplayName = "Projectile Rocket")
+	None                   UMETA(DisplayName = "None"),
+	TraceBullet            UMETA(DisplayName = "Trace Bullet"),
+	ProjectileRocket       UMETA(DisplayName = "Projectile Rocket"),
+	ProjectileHomingRocket UMETA(DisplayName = "Projectile Homing Rocket")
 };
 
 UCLASS()
@@ -39,6 +40,7 @@ public:
 	UStaticMeshComponent* GetTurretMesh() const;
 	USceneComponent* GetFireSpawnPoint() const;
 	UPawnMovementComponentBase* GetPawnMovementComponent() const;
+	UShootComponent* GetShootComponent() const;
 
 	FRotator GetTurretRotation() const;
 	FRotator GetTurretInitialRotation() const;
@@ -67,7 +69,7 @@ protected:
 		float RightMaxAngle
 	);
 
-	virtual void Fire();
+	virtual void Fire(USceneComponent* Target = nullptr);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
