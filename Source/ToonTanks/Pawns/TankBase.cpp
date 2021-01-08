@@ -33,8 +33,8 @@ void ATankBase::HandleDestruction() {
 	SetActorTickEnabled(false);
 }
 
-void ATankBase::Rotate(float Value) {
-	const float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
+void ATankBase::RotateBase(float Value) {
+	const float RotateAmount = Value * BaseRotationSpeed * GetWorld()->DeltaTimeSeconds;
 	const auto Rotation = FRotator(0, RotateAmount, 0);
 	AddActorLocalRotation(FQuat(Rotation), true);
 }
@@ -58,11 +58,13 @@ void ATankBase::Tick(float DeltaTime) {
 	APawnBase::Tick(DeltaTime);
 
 	if (PlayerController) {
-		FHitResult TraceHitResult;
-		PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult);
-		FVector HitLocation = TraceHitResult.ImpactPoint;
+		FVector MouseLocation, MouseDirection;
+		PlayerController->DeprojectMousePositionToWorld(MouseLocation, MouseDirection);
 
-		RotateTurretToTarget(HitLocation);
+		const auto CurrentRotation = GetTurretRotation();
+		const auto TargetRotation = MouseDirection.Rotation();
+		const auto NewRotation = FRotator(CurrentRotation.Pitch, TargetRotation.Yaw, CurrentRotation.Roll);
+		RotateTurret(NewRotation);
 	}
 }
 
@@ -70,6 +72,7 @@ void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ATankBase::MoveForward);
-	PlayerInputComponent->BindAxis("Turn", this, &ATankBase::Rotate);
+	PlayerInputComponent->BindAxis("Turn", this, &ATankBase::RotateBase);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::CheckFire);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::CheckFire);
 }

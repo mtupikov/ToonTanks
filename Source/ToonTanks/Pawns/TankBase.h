@@ -23,7 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void Rotate(float Value);
+	void RotateBase(float Value);
 	void MoveForward(float Value);
 	void CheckFire();
 
@@ -40,7 +40,7 @@ private:
 	float MoveSpeed = 400.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float RotateSpeed = 200.0f;
+	float BaseRotationSpeed = 200.0f;
 
 	FTimerHandle FireRateTimerHandle;
 	APlayerController* PlayerController = nullptr;

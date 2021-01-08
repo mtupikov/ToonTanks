@@ -33,6 +33,7 @@ public:
 	static float MaximumRotationAngle();
 
 	float GetFireRate() const;
+	float GetTurretRotationSpeed() const;
 
 	bool IsAlive() const;
 	void SetIsAlive(bool Value);

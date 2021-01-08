@@ -86,6 +86,10 @@ float APawnBase::GetFireRate() const {
 	return FireRate;
 }
 
+float APawnBase::GetTurretRotationSpeed() const {
+	return TurretRotationSpeed;
+}
+
 UStaticMeshComponent* APawnBase::GetTurretMesh() const {
 	return TurretMesh;
 }
