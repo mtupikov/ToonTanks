@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "ToonTanks/Pawns/TankBase.h"
+#include "ToonTanks/Components/HealthComponent.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -12,6 +13,8 @@ AMineBase::AMineBase() {
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	BaseMesh->OnComponentHit.AddDynamic(this, &AMineBase::OnHit);
 	RootComponent = BaseMesh;
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
 void AMineBase::BeginPlay() {
@@ -22,8 +25,6 @@ void AMineBase::BeginPlay() {
 
 void AMineBase::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-
-	DrawDebugSphere(GetWorld(), GetActorLocation(), DetectDistance, 6, FColor::Red, true, 10.0f);
 
 	if (!PlayerPawn || DistanceToPlayer() > DetectDistance || !PlayerPawn->IsAlive()) {
 		GetWorld()->GetTimerManager().ClearTimer(DetonationTimerHandle);
@@ -49,7 +50,29 @@ void AMineBase::BlowUp() {
 		UGameplayStatics::SpawnEmitterAtLocation(this, DetonationParticle, GetActorLocation());
 	}
 
-	UGameplayStatics::ApplyDamage(PlayerPawn, AreaDamage, GetOwner()->GetInstigatorController(), this, DamageType);
+	TArray<AActor*> OutActors;
+	const TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes{
+		UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic),
+		UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody)
+	};
+	const TArray<AActor*> ActorsToIgnore{ this };
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(),
+		GetActorLocation(),
+		DetectDistance,
+		ObjectTypes,
+		nullptr,
+		ActorsToIgnore,
+		OutActors
+	);
+
+	for (auto* Actor : OutActors) {
+		if (!GetOwner()) {
+			continue;
+		}
+
+		UGameplayStatics::ApplyDamage(Actor, AreaDamage, GetOwner()->GetInstigatorController(), this, DamageType);
+	}
 
 	Destroy();
 }

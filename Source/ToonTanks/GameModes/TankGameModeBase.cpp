@@ -2,6 +2,7 @@
 
 #include "ToonTanks/Pawns/PawnBase.h"
 #include "ToonTanks/Pawns/TurretBase.h"
+#include "ToonTanks/Pawns/MineBase.h"
 #include "ToonTanks/Controllers/PlayerControllerBase.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -23,6 +24,8 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor) {
 		if (TargetTurretsCount == 0) {
 			HandleGameOver(true);
 		}
+	} else if (AMineBase* DestroyedMine = Cast<AMineBase>(DeadActor)) {
+		DestroyedMine->BlowUp();
 	}
 }
 

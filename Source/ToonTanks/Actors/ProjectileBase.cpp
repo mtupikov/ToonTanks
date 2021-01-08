@@ -4,8 +4,10 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/DamageType.h"
-#include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AProjectileBase::AProjectileBase() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -67,5 +69,26 @@ void AProjectileBase::OnHit(
 void AProjectileBase::BlowUp() {
 	UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 	UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
+
+	TArray<AActor*> OutActors;
+	const TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes{
+		UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic),
+		UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody)
+	};
+	const TArray<AActor*> ActorsToIgnore{ this };
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(),
+		GetActorLocation(),
+		AreaDamageDistance,
+		ObjectTypes,
+		nullptr,
+		ActorsToIgnore,
+		OutActors
+	);
+
+	for (auto* Actor : OutActors) {
+		UGameplayStatics::ApplyDamage(Actor, AreaDamage, GetOwner()->GetInstigatorController(), this, DamageType);
+	}
+
 	Destroy();
 }

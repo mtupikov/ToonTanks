@@ -8,6 +8,7 @@ class ATankBase;
 class USoundBase;
 class UStaticMeshComponent;
 class UParticleSystem;
+class UHealthComponent;
 
 UCLASS()
 class TOONTANKS_API AMineBase : public APawn {
@@ -18,11 +19,12 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void BlowUp();
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	void BlowUp();
 	void SelectPlayerPawn();
 	float DistanceToPlayer();
 
@@ -34,6 +36,9 @@ private:
 		FVector NormalImpulse,
 		const FHitResult& Hit
 	);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BaseMesh = nullptr;
