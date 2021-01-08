@@ -18,6 +18,12 @@ void ATankBase::BeginPlay() {
 	APawnBase::BeginPlay();
 
 	PlayerController = Cast<APlayerController>(GetController());
+	PlayerController->bShowMouseCursor = false;
+
+	FInputModeGameAndUI InputMode;
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+	InputMode.SetHideCursorDuringCapture(false);
+	PlayerController->SetInputMode(InputMode);
 
 	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
 		GetPawnMovementComponent()->SetMoveSpeed(MoveSpeed);
