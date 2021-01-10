@@ -9,6 +9,10 @@
 ATankBase::ATankBase() {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	SpringArmComponent->SetupAttachment(GetTurretMesh());
+	SpringArmComponent->bEnableCameraLag = true;
+	SpringArmComponent->bEnableCameraRotationLag = true;
+	SpringArmComponent->CameraLagSpeed = 7.0f;
+	SpringArmComponent->CameraRotationLagSpeed = 3.0f;
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
