@@ -8,7 +8,7 @@
 
 ATankBase::ATankBase() {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
-	SpringArmComponent->SetupAttachment(RootComponent);
+	SpringArmComponent->SetupAttachment(GetTurretMesh());
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
@@ -19,10 +19,9 @@ void ATankBase::BeginPlay() {
 
 	PlayerController = Cast<APlayerController>(GetController());
 	PlayerController->bShowMouseCursor = false;
-
-	FInputModeGameAndUI InputMode;
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
-	InputMode.SetHideCursorDuringCapture(false);
+	
+	FInputModeGameOnly InputMode;
+	InputMode.SetConsumeCaptureMouseDown(false);
 	PlayerController->SetInputMode(InputMode);
 
 	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
@@ -45,6 +44,13 @@ void ATankBase::RotateBase(float Value) {
 	AddActorLocalRotation(FQuat(Rotation), true);
 }
 
+void ATankBase::RotateTurret(float Value) {
+	const auto CurrentRotation = GetTurretRotation();
+	const auto NewYaw = CurrentRotation.Yaw + Value * GetTurretRotationSpeed() * GetWorld()->DeltaTimeSeconds;
+	const auto RotateTo = FRotator(CurrentRotation.Pitch, NewYaw, CurrentRotation.Roll);
+	APawnBase::RotateTurret(RotateTo);
+}
+
 void ATankBase::MoveForward(float Value) {
 	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
 		GetPawnMovementComponent()->AddInputVector(GetActorForwardVector() * Value);
@@ -62,23 +68,14 @@ void ATankBase::CheckFire() {
 
 void ATankBase::Tick(float DeltaTime) {
 	APawnBase::Tick(DeltaTime);
-
-	if (PlayerController) {
-		FVector MouseLocation, MouseDirection;
-		PlayerController->DeprojectMousePositionToWorld(MouseLocation, MouseDirection);
-
-		const auto CurrentRotation = GetTurretRotation();
-		const auto TargetRotation = MouseDirection.Rotation();
-		const auto NewRotation = FRotator(CurrentRotation.Pitch, TargetRotation.Yaw, CurrentRotation.Roll);
-		RotateTurret(NewRotation);
-	}
 }
 
 void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ATankBase::MoveForward);
-	PlayerInputComponent->BindAxis("Turn", this, &ATankBase::RotateBase);
+	PlayerInputComponent->BindAxis("TurnBase", this, &ATankBase::RotateBase);
+	PlayerInputComponent->BindAxis("TurnTurret", this, &ATankBase::RotateTurret);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::CheckFire);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::CheckFire);
 }

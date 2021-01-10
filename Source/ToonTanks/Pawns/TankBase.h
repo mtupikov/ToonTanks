@@ -24,6 +24,7 @@ protected:
 
 private:
 	void RotateBase(float Value);
+	void RotateTurret(float Value);
 	void MoveForward(float Value);
 	void CheckFire();
 
