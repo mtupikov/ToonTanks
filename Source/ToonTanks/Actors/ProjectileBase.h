@@ -31,6 +31,7 @@ private:
 		const FHitResult& Hit
 	);
 
+	UFUNCTION(BlueprintCallable, Category = "Destruction")
 	void BlowUp();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
