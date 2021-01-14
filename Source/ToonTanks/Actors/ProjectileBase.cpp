@@ -87,7 +87,9 @@ void AProjectileBase::BlowUp() {
 	);
 
 	for (auto* Actor : OutActors) {
-		UGameplayStatics::ApplyDamage(Actor, AreaDamage, GetOwner()->GetInstigatorController(), this, DamageType);
+		if (GetOwner()) {
+			UGameplayStatics::ApplyDamage(Actor, AreaDamage, GetOwner()->GetInstigatorController(), this, DamageType);
+		}
 	}
 
 	Destroy();

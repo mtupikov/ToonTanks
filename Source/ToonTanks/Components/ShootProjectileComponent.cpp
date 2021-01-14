@@ -14,6 +14,12 @@ void UShootProjectileComponent::Fire(const FVector& SpawnLocation, const FRotato
 	}
 
 	AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
+
+	if (!TempProjectile) {
+		UE_LOG(LogTemp, Error, TEXT("Cannot spawn AProjectileBase class, oops! Owner: %s"), *Owner->GetName());
+		return;
+	}
+
 	TempProjectile->SetOwner(Owner);
 
 	if (Target && bIsHomingProjectile) {
