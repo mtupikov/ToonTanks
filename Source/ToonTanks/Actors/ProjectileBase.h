@@ -17,6 +17,7 @@ public:
 	AProjectileBase();
 
 	void SetHomingTarget(USceneComponent* Target);
+	void BlowUp();
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,9 +31,6 @@ private:
 		FVector NormalImpulse,
 		const FHitResult& Hit
 	);
-
-	UFUNCTION(BlueprintCallable, Category = "Destruction")
-	void BlowUp();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement = nullptr;
