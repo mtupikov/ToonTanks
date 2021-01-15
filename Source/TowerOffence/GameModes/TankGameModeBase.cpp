@@ -1,5 +1,6 @@
 #include "TankGameModeBase.h"
 
+#include "TowerOffence/Actors/ForceFieldBase.h"
 #include "TowerOffence/Pawns/PawnBase.h"
 #include "TowerOffence/Pawns/TurretBase.h"
 #include "TowerOffence/Pawns/MineBase.h"
@@ -26,6 +27,8 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor) {
 		}
 	} else if (AMineBase* DestroyedMine = Cast<AMineBase>(DeadActor)) {
 		DestroyedMine->BlowUp();
+	} else if (AForceFieldBase* DestroyedForceField = Cast<AForceFieldBase>(DeadActor)) {
+		DestroyedForceField->Deactivate();
 	}
 }
 

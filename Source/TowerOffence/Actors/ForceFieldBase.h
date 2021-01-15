@@ -8,6 +8,7 @@ class USphereComponent;
 class UCurveFloat;
 class UTimelineComponent;
 class UForceFieldImpact;
+class UHealthComponent;
 
 UCLASS()
 class TOWEROFFENCE_API AForceFieldBase : public AActor {
@@ -15,6 +16,9 @@ class TOWEROFFENCE_API AForceFieldBase : public AActor {
 
 public:
 	AForceFieldBase();
+
+	void Activate();
+	void Deactivate();
 
 private:
 	virtual void Tick(float DeltaTime) override;
@@ -36,6 +40,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ForceFieldMesh = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* FloatCurve = nullptr;

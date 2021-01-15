@@ -19,10 +19,6 @@ public:
 	void SetHomingTarget(USceneComponent* Target);
 	void BlowUp();
 
-protected:
-	virtual void BeginPlay() override;
-
-private:
 	UFUNCTION()
 	void OnHit(
 		UPrimitiveComponent* HitComponent,
@@ -32,6 +28,10 @@ private:
 		const FHitResult& Hit
 	);
 
+protected:
+	virtual void BeginPlay() override;
+
+private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement = nullptr;
 

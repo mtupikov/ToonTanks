@@ -5,8 +5,9 @@
 #include "Curves/CurveFloat.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "TowerOffence/Utils/ForceFieldImpact.h"
 #include "ProjectileBase.h"
+#include "TowerOffence/Components/HealthComponent.h"
+#include "TowerOffence/Utils/ForceFieldImpact.h"
 
 AForceFieldBase::AForceFieldBase() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -19,6 +20,8 @@ AForceFieldBase::AForceFieldBase() {
 	ForceFieldMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Force Field Mesh"));
 	ForceFieldMesh->SetCollisionEnabled(ECollisionEnabled::Type::QueryOnly);
 	ForceFieldMesh->SetupAttachment(ForceFieldCollision);
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ImpactMeshAsset(TEXT("StaticMesh'/Game/Assets/Meshes/SM_ForceFieldImpact.SM_ForceFieldImpact'"));
 	if (ImpactMeshAsset.Succeeded()) {
@@ -35,6 +38,10 @@ void AForceFieldBase::OnBeginOverlap(
 	const FHitResult& SweepResult
 ) {
 	if (!OtherActor || OtherActor == this) {
+		return;
+	}
+
+	if (IsHidden()) {
 		return;
 	}
 
@@ -63,7 +70,15 @@ void AForceFieldBase::OnBeginOverlap(
 	);
 	ActiveImpacts.Add(NewImpact->GetUniqueID(), NewImpact);
 
-	Projectile->BlowUp();
+	Projectile->OnHit(OtherComp, this, OverlappedComp, {}, SweepResult);
+}
+
+void AForceFieldBase::Activate() {
+	SetActorHiddenInGame(false);
+}
+
+void AForceFieldBase::Deactivate() {
+	SetActorHiddenInGame(true);
 }
 
 void AForceFieldBase::Tick(float DeltaTime) {

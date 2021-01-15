@@ -43,11 +43,11 @@ void AProjectileBase::SetHomingTarget(USceneComponent* Target) {
 }
 
 void AProjectileBase::OnHit(
-	UPrimitiveComponent* HitComponent,
+	UPrimitiveComponent*,
 	AActor* OtherActor,
-	UPrimitiveComponent* OtherComponent,
-	FVector NormalImpulse,
-	const FHitResult& Hit
+	UPrimitiveComponent*,
+	FVector,
+	const FHitResult&
 ) {
 	const auto* MyOwner = GetOwner();
 	if (!MyOwner) {
