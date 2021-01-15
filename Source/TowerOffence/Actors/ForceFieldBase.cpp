@@ -5,10 +5,11 @@
 #include "Curves/CurveFloat.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "TowerOffence/Utils/ForceFieldImpact.h"
 #include "ProjectileBase.h"
 
 AForceFieldBase::AForceFieldBase() {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	ForceFieldCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Force Field Collision"));
 	ForceFieldCollision->OnComponentBeginOverlap.AddDynamic(this, &AForceFieldBase::OnBeginOverlap);
@@ -18,31 +19,11 @@ AForceFieldBase::AForceFieldBase() {
 	ForceFieldMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Force Field Mesh"));
 	ForceFieldMesh->SetCollisionEnabled(ECollisionEnabled::Type::QueryOnly);
 	ForceFieldMesh->SetupAttachment(ForceFieldCollision);
-}
 
-void AForceFieldBase::BeginPlay() {
-	Super::BeginPlay();
-
-	FOnTimelineFloat OnTimelineCallback;
-	
-	if (FloatCurve) {
-		ImpactAnimationTimeline = NewObject<UTimelineComponent>(this, FName("Impact Animation Timeline"));
-		ImpactAnimationTimeline->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-		this->BlueprintCreatedComponents.Add(ImpactAnimationTimeline);
-		ImpactAnimationTimeline->SetNetAddressable();
-
-		ImpactAnimationTimeline->SetLooping(false);
-		ImpactAnimationTimeline->SetTimelineLength(0.5f);
-		ImpactAnimationTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
-		ImpactAnimationTimeline->SetPlaybackPosition(0.0f, false);
-
-		OnTimelineCallback.BindUFunction(this, FName(TEXT("TimelineCallback")));
-		ImpactAnimationTimeline->AddInterpFloat(FloatCurve, OnTimelineCallback);
-
-		ImpactAnimationTimeline->RegisterComponent();
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ImpactMeshAsset(TEXT("StaticMesh'/Game/Assets/Meshes/SM_ForceFieldImpact.SM_ForceFieldImpact'"));
+	if (ImpactMeshAsset.Succeeded()) {
+		ImpactMesh = ImpactMeshAsset.Object;
 	}
-
-	ForceFieldMaterial = ForceFieldMesh->GetMaterial(0);
 }
 
 void AForceFieldBase::OnBeginOverlap(
@@ -61,33 +42,40 @@ void AForceFieldBase::OnBeginOverlap(
 	if (!Projectile) {
 		return;
 	}
-
-	if (ImpactAnimationTimeline) {
-		DynamicMaterial = UMaterialInstanceDynamic::Create(ForceFieldMaterial, this);
-		DynamicMaterial->SetVectorParameterValue(FName(TEXT("Position")), SweepResult.ImpactPoint);
-		ForceFieldMesh->SetMaterial(0, DynamicMaterial);
-
-		ImpactAnimationTimeline->PlayFromStart();
-	}
-
+	
 	FVector ImpactPoint;
 	const auto Distance = ForceFieldCollision->GetDistanceToCollision(Projectile->GetActorLocation(), ImpactPoint);
 	const auto IsNearZero = UKismetMathLibrary::NearlyEqual_FloatFloat(Distance, 0.000f);
-	
-	if (!IsNearZero) {
-		Projectile->BlowUp();
-	}
-}
 
-void AForceFieldBase::TimelineCallback(float Value) {
-	DynamicMaterial->SetScalarParameterValue(FName(TEXT("Radius")), Value * 100.0f);
-	DynamicMaterial->SetScalarParameterValue(FName(TEXT("Hardness")), Value);
+	if (IsNearZero) {
+		return;
+	}
+
+	const auto ImpactName = FString::Printf(TEXT("Impact %d"), ActiveImpacts.Num());
+	auto* NewImpact = NewObject<UForceFieldImpact>(this, UForceFieldImpact::StaticClass(), FName(ImpactName));
+	if (!NewImpact) {
+		return;
+	}
+
+	NewImpact->Init(
+		this,
+		SweepResult.ImpactPoint
+	);
+	ActiveImpacts.Add(NewImpact->GetUniqueID(), NewImpact);
+
+	Projectile->BlowUp();
 }
 
 void AForceFieldBase::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (ImpactAnimationTimeline) {
-		ImpactAnimationTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
+	for (auto& Pair : ActiveImpacts) {
+		if (Pair.Value) {
+			Pair.Value->Tick(DeltaTime);
+		}
 	}
+}
+
+void AForceFieldBase::RemoveFinishedImpact(uint32 Key) {
+	ActiveImpacts.Remove(Key);
 }

@@ -7,6 +7,7 @@
 class USphereComponent;
 class UCurveFloat;
 class UTimelineComponent;
+class UForceFieldImpact;
 
 UCLASS()
 class TOWEROFFENCE_API AForceFieldBase : public AActor {
@@ -15,12 +16,11 @@ class TOWEROFFENCE_API AForceFieldBase : public AActor {
 public:
 	AForceFieldBase();
 
-protected:
-	virtual void BeginPlay() override;
-
 private:
 	virtual void Tick(float DeltaTime) override;
 
+	void RemoveFinishedImpact(uint32 Key);
+	
 	UFUNCTION()
 	void OnBeginOverlap(
 		UPrimitiveComponent* OverlappedComp,
@@ -30,12 +30,6 @@ private:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	);
-
-	UFUNCTION()
-	void TimelineCallback(float Value);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UTimelineComponent* ImpactAnimationTimeline = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USphereComponent* ForceFieldCollision = nullptr;
@@ -47,8 +41,13 @@ private:
 	UCurveFloat* FloatCurve = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
-	float ImpactRadius = 100.0;
+	float ImpactRadius = 100.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
+	float ImpactTime = 0.5f;
 
-	UMaterialInterface* ForceFieldMaterial = nullptr;
-	UMaterialInstanceDynamic* DynamicMaterial = nullptr;
+	UStaticMesh* ImpactMesh = nullptr;
+	TMap<uint32, UForceFieldImpact*> ActiveImpacts;
+
+	friend class UForceFieldImpact;
 };
