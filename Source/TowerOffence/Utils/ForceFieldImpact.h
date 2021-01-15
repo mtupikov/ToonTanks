@@ -31,4 +31,5 @@ private:
 	AForceFieldBase* Owner = nullptr;
 	UTimelineComponent* ImpactAnimationTimeline = nullptr;
 	UMaterialInstanceDynamic* DynamicMaterial = nullptr;
+	UStaticMeshComponent* ImpactSphere = nullptr;
 };

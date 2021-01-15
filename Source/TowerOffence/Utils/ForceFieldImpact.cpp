@@ -35,7 +35,7 @@ void UForceFieldImpact::Init(
 	// setup new mesh
 
 	const auto SphereName = FString::Printf(TEXT("Impact Sphere %d"), GetUniqueID());
-	UStaticMeshComponent* ImpactSphere = NewObject<UStaticMeshComponent>(Owner->ImpactMesh, *SphereName);
+	ImpactSphere = NewObject<UStaticMeshComponent>(Owner->ImpactMesh, *SphereName);
 	ImpactSphere->SetStaticMesh(Owner->ImpactMesh);
 	ImpactSphere->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	ImpactSphere->SetupAttachment(Owner->RootComponent);
@@ -54,6 +54,8 @@ void UForceFieldImpact::TimelineCallback(float Value) {
 }
 
 void UForceFieldImpact::TimelineFinishedCallback() {
+	ImpactSphere->UnregisterComponent();
+	ImpactSphere->DetachFromParent();
 	Owner->RemoveFinishedImpact(GetUniqueID());
 }
 
