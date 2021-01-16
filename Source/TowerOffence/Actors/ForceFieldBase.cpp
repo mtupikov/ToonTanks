@@ -128,6 +128,10 @@ void AForceFieldBase::Deactivate() {
 	DisintegrationAnimationTimeline->PlayFromStart();
 }
 
+bool AForceFieldBase::IsActive() const {
+	return !IsHidden() && UKismetMathLibrary::Greater_FloatFloat(HealthComponent->GetHealth(), 0.0f);
+}
+
 void AForceFieldBase::BeginPlay() {
 	Super::BeginPlay();
 

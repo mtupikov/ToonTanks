@@ -20,6 +20,8 @@ public:
 	void Activate();
 	void Deactivate();
 
+	bool IsActive() const;
+
 protected:
 	virtual void BeginPlay() override;
 

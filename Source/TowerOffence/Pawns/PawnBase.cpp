@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "TowerOffence/Actors/ForceFieldBase.h"
 #include "TowerOffence/Actors/ProjectileBase.h"
 #include "TowerOffence/Components/HealthComponent.h"
 #include "TowerOffence/Components/PawnMovementComponentBase.h"
@@ -56,6 +57,18 @@ void APawnBase::BeginPlay() {
 			SPC->SetProjectile(ProjectileClass);
 		}
 	}
+
+	if (ForceFieldBP.GetDefaultObject()) {
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.bNoFail = true;
+		SpawnInfo.Owner = this;
+		SpawnInfo.Instigator = nullptr;
+		SpawnInfo.bDeferConstruction = false;
+
+		ForceField = GetWorld()->SpawnActor<AForceFieldBase>(ForceFieldBP, SpawnInfo);
+		ForceField->SetActorScale3D({4.3, 4.3, 4.3});
+		ForceField->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	}
 }
 
 bool APawnBase::IsAlive() const {
@@ -66,6 +79,10 @@ void APawnBase::SetIsAlive(bool Value) {
 	if (bIsPawnAlive != Value) {
 		bIsPawnAlive = Value;
 	}
+}
+
+bool APawnBase::ForceFieldIsActive() const {
+	return ForceField && ForceField->IsActive();
 }
 
 void APawnBase::RotateTurretToTarget(

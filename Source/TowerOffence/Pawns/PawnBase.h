@@ -5,6 +5,7 @@
 #include "PawnBase.generated.h"
 
 class AProjectileBase;
+class AForceFieldBase;
 class UPawnMovementComponentBase;
 class USceneComponent;
 class UStaticMeshComponent;
@@ -37,6 +38,8 @@ public:
 
 	bool IsAlive() const;
 	void SetIsAlive(bool Value);
+
+	bool ForceFieldIsActive() const;
 
 	UStaticMeshComponent* GetTurretMesh() const;
 	USceneComponent* GetFireSpawnPoint() const;
@@ -91,6 +94,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UShootComponent* ShootComponent = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AForceFieldBase> ForceFieldBP = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* DeathSound = nullptr;
 
@@ -109,6 +115,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float FireRate = 2.0f;
 
+	AForceFieldBase* ForceField = nullptr;
 	FRotator InitialRotator;
 	bool bIsPawnAlive = true;
 };

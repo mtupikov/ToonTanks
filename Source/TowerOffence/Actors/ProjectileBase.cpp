@@ -9,6 +9,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+#include "TowerOffence/Pawns/PawnBase.h"
+
 AProjectileBase::AProjectileBase() {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -88,6 +90,11 @@ void AProjectileBase::BlowUp() {
 
 	for (auto* Actor : OutActors) {
 		if (GetOwner()) {
+			auto* Pawn = Cast<APawnBase>(Actor);
+			if (Pawn && Pawn->ForceFieldIsActive()) {
+				continue;
+			}
+
 			UGameplayStatics::ApplyDamage(Actor, AreaDamage, GetOwner()->GetInstigatorController(), this, DamageType);
 		}
 	}
