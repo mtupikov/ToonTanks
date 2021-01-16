@@ -8,6 +8,18 @@ UHealthComponent::UHealthComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+float UHealthComponent::GetDefaultHealth() const {
+	return DefaultHealth;
+}
+
+float UHealthComponent::GetHealth() const {
+	return Health;
+}
+
+void UHealthComponent::ResetHealth() {
+	Health = DefaultHealth;
+}
+
 void UHealthComponent::BeginPlay() {
 	Super::BeginPlay();
 

@@ -27,7 +27,7 @@ void UForceFieldImpact::Init(
 
 	OnTimelineCallback.BindUFunction(this, FName(TEXT("TimelineCallback")));
 	OnTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TimelineFinishedCallback")));
-	ImpactAnimationTimeline->AddInterpFloat(Owner->FloatCurve, OnTimelineCallback);
+	ImpactAnimationTimeline->AddInterpFloat(Owner->ImpactFloatCurve, OnTimelineCallback);
 	ImpactAnimationTimeline->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
 
 	ImpactAnimationTimeline->RegisterComponent();
@@ -54,8 +54,9 @@ void UForceFieldImpact::TimelineCallback(float Value) {
 }
 
 void UForceFieldImpact::TimelineFinishedCallback() {
+	const auto Rules = FDetachmentTransformRules(EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, EDetachmentRule::KeepRelative, false);
 	ImpactSphere->UnregisterComponent();
-	ImpactSphere->DetachFromParent();
+	ImpactSphere->DetachFromComponent(Rules);
 	Owner->RemoveFinishedImpact(GetUniqueID());
 }
 

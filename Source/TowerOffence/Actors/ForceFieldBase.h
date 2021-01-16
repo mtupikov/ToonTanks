@@ -20,11 +20,23 @@ public:
 	void Activate();
 	void Deactivate();
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
 	virtual void Tick(float DeltaTime) override;
 
 	void RemoveFinishedImpact(uint32 Key);
 	
+	UFUNCTION()
+	void OnTakeDamage(
+		AActor* DamagedActor,
+		float Damage,
+		const UDamageType* DamageType,
+		AController* InstigatedBy,
+		AActor* DamageCauser
+	);
+
 	UFUNCTION()
 	void OnBeginOverlap(
 		UPrimitiveComponent* OverlappedComp,
@@ -34,6 +46,12 @@ private:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	);
+
+	UFUNCTION()
+	void TimelineCallback(float Value);
+
+	UFUNCTION()
+	void TimelineFinishedCallback();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USphereComponent* ForceFieldCollision = nullptr;
@@ -45,7 +63,10 @@ private:
 	UHealthComponent* HealthComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
-	UCurveFloat* FloatCurve = nullptr;
+	UCurveFloat* ImpactFloatCurve = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* DisintegrationFloatCurve = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
 	float ImpactRadius = 100.0f;
@@ -53,8 +74,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
 	float ImpactTime = 0.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
+	float DisintegrationTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
+	float DisintegrationAmountPerHit = 0.020f;
+
 	UStaticMesh* ImpactMesh = nullptr;
 	TMap<uint32, UForceFieldImpact*> ActiveImpacts;
+	UMaterialInterface* ForceFieldMaterial = nullptr;
+	UMaterialInstanceDynamic* DynamicForceFieldMaterial = nullptr;
+	UTimelineComponent* DisintegrationAnimationTimeline = nullptr;
+	float CurrentDisintegrationAmount = 0.0f;
 
 	friend class UForceFieldImpact;
 };

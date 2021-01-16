@@ -13,6 +13,11 @@ class TOWEROFFENCE_API UHealthComponent : public UActorComponent {
 public:
 	UHealthComponent();
 
+	float GetDefaultHealth() const;
+	float GetHealth() const;
+
+	void ResetHealth();
+
 protected:
 	virtual void BeginPlay() override;
 
