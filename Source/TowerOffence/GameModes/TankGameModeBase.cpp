@@ -45,14 +45,6 @@ void ATankGameModeBase::HandleGameStart() {
 	PlayerController = Cast<APlayerControllerBase>(UGameplayStatics::GetPlayerController(this, 0));
 
 	GameStart();
-
-	if (PlayerController) {
-		PlayerController->SetPlayerEnabledState(false);
-
-		FTimerHandle PlayerEnabledHandle;
-		const auto PlayerEnableDelegate = FTimerDelegate::CreateUObject(PlayerController, &APlayerControllerBase::SetPlayerEnabledState, true);
-		GetWorld()->GetTimerManager().SetTimer(PlayerEnabledHandle, PlayerEnableDelegate, StartDelay, false);
-	}
 }
 
 void ATankGameModeBase::HandleGameOver(bool PlayerWon) {
