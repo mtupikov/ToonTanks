@@ -24,10 +24,6 @@ void ATurretBase::BeginPlay() {
 
 	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATurretBase::CheckFireCondition, GetFireRate(), true);
 	SelectPlayerPawn();
-
-	if (auto* ProjectileShootComponent = Cast<UShootProjectileComponent>(GetShootComponent())) {
-		ProjectileShootComponent->SetProjectileIsHoming(bHasHomingProjectile);
-	}
 }
 
 void ATurretBase::HandleDestruction() {

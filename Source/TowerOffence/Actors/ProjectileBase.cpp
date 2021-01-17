@@ -101,3 +101,11 @@ void AProjectileBase::BlowUp() {
 
 	Destroy();
 }
+
+float AProjectileBase::GetFireRate() const {
+	return FireRate;
+}
+
+bool AProjectileBase::IsHoming() const {
+	return bIsHoming;
+}

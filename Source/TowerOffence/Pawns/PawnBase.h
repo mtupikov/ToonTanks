@@ -10,15 +10,7 @@ class UPawnMovementComponentBase;
 class USceneComponent;
 class UStaticMeshComponent;
 class UHealthComponent;
-class UShootComponent;
-
-UENUM()
-enum class EShootType : uint8 {
-	None                   UMETA(DisplayName = "None"),
-	TraceBullet            UMETA(DisplayName = "Trace Bullet"),
-	ProjectileRocket       UMETA(DisplayName = "Projectile Rocket"),
-	ProjectileHomingRocket UMETA(DisplayName = "Projectile Homing Rocket")
-};
+class UShootProjectileComponent;
 
 UCLASS()
 class TOWEROFFENCE_API APawnBase : public APawn {
@@ -44,7 +36,7 @@ public:
 	UStaticMeshComponent* GetTurretMesh() const;
 	USceneComponent* GetFireSpawnPoint() const;
 	UPawnMovementComponentBase* GetPawnMovementComponent() const;
-	UShootComponent* GetShootComponent() const;
+	UShootProjectileComponent* GetShootComponent() const;
 
 	FRotator GetTurretRotation() const;
 	FRotator GetTurretInitialRotation() const;
@@ -92,7 +84,7 @@ private:
 	UPawnMovementComponentBase* MovementComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UShootComponent* ShootComponent = nullptr;
+	UShootProjectileComponent* ShootComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AForceFieldBase> ForceFieldBP = nullptr;
@@ -107,13 +99,7 @@ private:
 	TSubclassOf<AProjectileBase> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	EShootType ShootType = EShootType::None;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float TurretRotationSpeed = 60.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	float FireRate = 2.0f;
 
 	AForceFieldBase* ForceField = nullptr;
 	FRotator InitialRotator;

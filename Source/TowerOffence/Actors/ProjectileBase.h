@@ -19,6 +19,9 @@ public:
 	void SetHomingTarget(USceneComponent* Target);
 	void BlowUp();
 
+	float GetFireRate() const;
+	bool IsHoming() const;
+
 	UFUNCTION()
 	void OnHit(
 		UPrimitiveComponent* HitComponent,
@@ -57,6 +60,9 @@ private:
 	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+	float FireRate = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	float Damage = 50.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
@@ -71,5 +77,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float LifeSpanTime = 3.0;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	bool bIsHoming = false;
+
 	FTimerHandle LifeSpanTimerHandle;
 };

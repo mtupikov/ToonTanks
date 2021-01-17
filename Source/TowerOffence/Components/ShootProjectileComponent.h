@@ -1,22 +1,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ShootComponent.h"
+#include "Components/ActorComponent.h"
 #include "ShootProjectileComponent.generated.h"
 
 class AProjectileBase;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class TOWEROFFENCE_API UShootProjectileComponent : public UShootComponent {
+class TOWEROFFENCE_API UShootProjectileComponent : public UActorComponent {
 	GENERATED_BODY()
 
 public:
-	virtual void Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target = nullptr) override;
+	void Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target = nullptr);
 
 	void SetProjectile(TSubclassOf<AProjectileBase> Projectile);
-	void SetProjectileIsHoming(bool Value);
+
+	float GetFireRate() const;
 
 private:
 	TSubclassOf<AProjectileBase> ProjectileClass;
-	bool bIsHomingProjectile = false;
 };

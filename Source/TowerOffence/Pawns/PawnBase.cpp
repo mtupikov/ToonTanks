@@ -9,7 +9,6 @@
 #include "TowerOffence/Components/HealthComponent.h"
 #include "TowerOffence/Components/PawnMovementComponentBase.h"
 #include "TowerOffence/Components/ShootProjectileComponent.h"
-#include "TowerOffence/Components/ShootTraceComponent.h"
 
 APawnBase::APawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -34,28 +33,10 @@ void APawnBase::BeginPlay() {
 
 	InitialRotator = TurretMesh->GetComponentRotation();
 
-	switch (ShootType) {
-	case EShootType::ProjectileHomingRocket: {
-		ShootComponent = NewObject<UShootProjectileComponent>(this, UShootProjectileComponent::StaticClass(), TEXT("Shoot Homing Projectile Component"));
-		Cast<UShootProjectileComponent>(ShootComponent)->SetProjectileIsHoming(true);
-		break;
-	}
-	case EShootType::ProjectileRocket: {
-		ShootComponent = NewObject<UShootProjectileComponent>(this, UShootProjectileComponent::StaticClass(), TEXT("Shoot Projectile Component"));
-		break;
-	}
-	case EShootType::TraceBullet: {
-		ShootComponent = NewObject<UShootTraceComponent>(this, UShootTraceComponent::StaticClass(), TEXT("Shoot Trace Bullet Component"));
-		break;
-	}
-	}
-
+	ShootComponent = NewObject<UShootProjectileComponent>(this, UShootProjectileComponent::StaticClass(), TEXT("Shoot Projectile Component"));
 	if (ShootComponent) {
+		ShootComponent->SetProjectile(ProjectileClass);
 		ShootComponent->RegisterComponent();
-
-		if (auto* SPC = Cast<UShootProjectileComponent>(ShootComponent)) {
-			SPC->SetProjectile(ProjectileClass);
-		}
 	}
 
 	if (ForceFieldBP.GetDefaultObject()) {
@@ -105,7 +86,7 @@ void APawnBase::RotateTurretToTarget(
 }
 
 float APawnBase::GetFireRate() const {
-	return FireRate;
+	return ShootComponent->GetFireRate();
 }
 
 float APawnBase::GetTurretRotationSpeed() const {
@@ -124,7 +105,7 @@ UPawnMovementComponentBase* APawnBase::GetPawnMovementComponent() const {
 	return MovementComponent;
 }
 
-UShootComponent* APawnBase::GetShootComponent() const {
+UShootProjectileComponent* APawnBase::GetShootComponent() const {
 	return ShootComponent;
 }
 

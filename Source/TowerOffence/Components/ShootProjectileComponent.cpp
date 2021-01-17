@@ -22,7 +22,7 @@ void UShootProjectileComponent::Fire(const FVector& SpawnLocation, const FRotato
 
 	TempProjectile->SetOwner(Owner);
 
-	if (Target && bIsHomingProjectile) {
+	if (Target && TempProjectile->IsHoming()) {
 		TempProjectile->SetHomingTarget(Target);
 	}
 }
@@ -31,8 +31,6 @@ void UShootProjectileComponent::SetProjectile(TSubclassOf<AProjectileBase> Proje
 	ProjectileClass = Projectile;
 }
 
-void UShootProjectileComponent::SetProjectileIsHoming(bool Value) {
-	if (bIsHomingProjectile != Value) {
-		bIsHomingProjectile = Value;
-	}
+float UShootProjectileComponent::GetFireRate() const {
+	return ProjectileClass.GetDefaultObject()->GetFireRate();
 }
