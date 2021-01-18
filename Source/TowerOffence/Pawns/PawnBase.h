@@ -95,7 +95,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* DeathParticle = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"), meta = (MustImplement = AProjectileBase))
 	TSubclassOf<AProjectileBase> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))

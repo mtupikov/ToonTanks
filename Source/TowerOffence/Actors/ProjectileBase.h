@@ -16,11 +16,9 @@ class TOWEROFFENCE_API AProjectileBase : public AActor {
 public:
 	AProjectileBase();
 
-	void SetHomingTarget(USceneComponent* Target);
-	void BlowUp();
+	virtual void DestroyProjectile();
 
 	float GetFireRate() const;
-	bool IsHoming() const;
 
 	UFUNCTION()
 	void OnHit(
@@ -34,7 +32,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement = nullptr;
 
@@ -72,13 +69,7 @@ private:
 	float AreaDamageDistance = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float MovementSpeed = 1300.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float LifeSpanTime = 3.0;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	bool bIsHoming = false;
-
 	FTimerHandle LifeSpanTimerHandle;
 };

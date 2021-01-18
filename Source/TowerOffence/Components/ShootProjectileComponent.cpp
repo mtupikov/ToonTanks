@@ -1,6 +1,7 @@
 #include "ShootProjectileComponent.h"
 
 #include "TowerOffence/Actors/ProjectileBase.h"
+#include "TowerOffence/Actors/HomingMissleProjectile.h"
 
 void UShootProjectileComponent::Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target) {
 	if (!ProjectileClass) {
@@ -22,8 +23,8 @@ void UShootProjectileComponent::Fire(const FVector& SpawnLocation, const FRotato
 
 	TempProjectile->SetOwner(Owner);
 
-	if (Target && TempProjectile->IsHoming()) {
-		TempProjectile->SetHomingTarget(Target);
+	if (auto* Homing = Cast<AHomingMissleProjectile>(TempProjectile)) {
+		Homing->SetHomingTarget(Target);
 	}
 }
 
