@@ -20,6 +20,8 @@ public:
 	void Activate();
 	void Deactivate();
 
+	void CreateImpact(const FVector& ImpactPoint);
+
 	bool IsActive() const;
 
 protected:
@@ -29,7 +31,8 @@ private:
 	virtual void Tick(float DeltaTime) override;
 
 	void RemoveFinishedImpact(uint32 Key);
-	
+	void CreateDynamicForceFieldMaterial();
+
 	UFUNCTION()
 	void OnTakeDamage(
 		AActor* DamagedActor,

@@ -4,13 +4,13 @@
 #include "GameFramework/Pawn.h"
 #include "PawnBase.generated.h"
 
-class AProjectileBase;
+class AAmmunitionBase;
 class AForceFieldBase;
 class UPawnMovementComponentBase;
 class USceneComponent;
 class UStaticMeshComponent;
 class UHealthComponent;
-class UShootProjectileComponent;
+class UShootAmmunitionComponent;
 
 UCLASS()
 class TOWEROFFENCE_API APawnBase : public APawn {
@@ -36,7 +36,7 @@ public:
 	UStaticMeshComponent* GetTurretMesh() const;
 	USceneComponent* GetFireSpawnPoint() const;
 	UPawnMovementComponentBase* GetPawnMovementComponent() const;
-	UShootProjectileComponent* GetShootComponent() const;
+	UShootAmmunitionComponent* GetShootComponent() const;
 
 	FRotator GetTurretRotation() const;
 	FRotator GetTurretInitialRotation() const;
@@ -84,7 +84,7 @@ private:
 	UPawnMovementComponentBase* MovementComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UShootProjectileComponent* ShootComponent = nullptr;
+	UShootAmmunitionComponent* ShootComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AForceFieldBase> ForceFieldBP = nullptr;
@@ -96,7 +96,7 @@ private:
 	UParticleSystem* DeathParticle = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"), meta = (MustImplement = AProjectileBase))
-	TSubclassOf<AProjectileBase> ProjectileClass;
+	TSubclassOf<AAmmunitionBase> AmmunitionClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float TurretRotationSpeed = 60.0f;

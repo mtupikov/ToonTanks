@@ -5,10 +5,10 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "TowerOffence/Actors/ForceFieldBase.h"
-#include "TowerOffence/Actors/ProjectileBase.h"
+#include "TowerOffence/Actors/AmmunitionBase.h"
 #include "TowerOffence/Components/HealthComponent.h"
 #include "TowerOffence/Components/PawnMovementComponentBase.h"
-#include "TowerOffence/Components/ShootProjectileComponent.h"
+#include "TowerOffence/Components/ShootAmmunitionComponent.h"
 
 APawnBase::APawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -33,9 +33,9 @@ void APawnBase::BeginPlay() {
 
 	InitialRotator = TurretMesh->GetComponentRotation();
 
-	ShootComponent = NewObject<UShootProjectileComponent>(this, UShootProjectileComponent::StaticClass(), TEXT("Shoot Projectile Component"));
+	ShootComponent = NewObject<UShootAmmunitionComponent>(this, UShootAmmunitionComponent::StaticClass(), TEXT("Shoot Ammunition Component"));
 	if (ShootComponent) {
-		ShootComponent->SetProjectile(ProjectileClass);
+		ShootComponent->SetAmmunition(AmmunitionClass);
 		ShootComponent->RegisterComponent();
 	}
 
@@ -105,7 +105,7 @@ UPawnMovementComponentBase* APawnBase::GetPawnMovementComponent() const {
 	return MovementComponent;
 }
 
-UShootProjectileComponent* APawnBase::GetShootComponent() const {
+UShootAmmunitionComponent* APawnBase::GetShootComponent() const {
 	return ShootComponent;
 }
 

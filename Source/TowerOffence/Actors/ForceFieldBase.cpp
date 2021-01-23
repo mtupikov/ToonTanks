@@ -48,6 +48,10 @@ void AForceFieldBase::OnTakeDamage(
 
 	const auto DisintegrastionAmount = (Damage / 10) * DisintegrationAmountPerHit;
 	CurrentDisintegrationAmount += DisintegrastionAmount;
+
+	if (!DynamicForceFieldMaterial) {
+		CreateDynamicForceFieldMaterial();
+	}
 	DynamicForceFieldMaterial->SetScalarParameterValue(FName(TEXT("Amount")), CurrentDisintegrationAmount);
 }
 
@@ -80,23 +84,7 @@ void AForceFieldBase::OnBeginOverlap(
 		return;
 	}
 
-	const auto ImpactName = FString::Printf(TEXT("Impact %d"), ActiveImpacts.Num());
-	auto* NewImpact = NewObject<UForceFieldImpact>(this, UForceFieldImpact::StaticClass(), FName(ImpactName));
-	if (!NewImpact) {
-		return;
-	}
-
-	if (!DynamicForceFieldMaterial) {
-		DynamicForceFieldMaterial = UMaterialInstanceDynamic::Create(ForceFieldMaterial, ForceFieldMesh);
-		ForceFieldMesh->SetMaterial(0, DynamicForceFieldMaterial);
-	}
-
-	NewImpact->Init(
-		this,
-		SweepResult.ImpactPoint
-	);
-	ActiveImpacts.Add(NewImpact->GetUniqueID(), NewImpact);
-
+	CreateImpact(SweepResult.ImpactPoint);
 	Projectile->OnHit(OtherComp, this, OverlappedComp, {}, SweepResult);
 }
 
@@ -126,6 +114,24 @@ void AForceFieldBase::Activate() {
 
 void AForceFieldBase::Deactivate() {
 	DisintegrationAnimationTimeline->PlayFromStart();
+}
+
+void AForceFieldBase::CreateImpact(const FVector& ImpactPoint) {
+	const auto ImpactName = FString::Printf(TEXT("Impact %d"), ActiveImpacts.Num());
+	auto* NewImpact = NewObject<UForceFieldImpact>(this, UForceFieldImpact::StaticClass(), FName(ImpactName));
+	if (!NewImpact) {
+		return;
+	}
+
+	if (!DynamicForceFieldMaterial) {
+		CreateDynamicForceFieldMaterial();
+	}
+
+	NewImpact->Init(
+		this,
+		ImpactPoint
+	);
+	ActiveImpacts.Add(NewImpact->GetUniqueID(), NewImpact);
 }
 
 bool AForceFieldBase::IsActive() const {
@@ -164,4 +170,9 @@ void AForceFieldBase::Tick(float DeltaTime) {
 
 void AForceFieldBase::RemoveFinishedImpact(uint32 Key) {
 	ActiveImpacts.Remove(Key);
+}
+
+void AForceFieldBase::CreateDynamicForceFieldMaterial() {
+	DynamicForceFieldMaterial = UMaterialInstanceDynamic::Create(ForceFieldMaterial, ForceFieldMesh);
+	ForceFieldMesh->SetMaterial(0, DynamicForceFieldMaterial);
 }
