@@ -2,6 +2,8 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 #include "TowerOffence/Pawns/MineBase.h"
 #include "TowerOffence/Pawns/PawnBase.h"
@@ -72,12 +74,36 @@ void AHitscanBase::ProcessInstantHit(
 		break;
 	}
 
+	if (TrailParticle && TrailParticle->IsValid()) {
+		const auto DistanceIsNan = FGenericPlatformMath::IsNaN(FVector::Dist(Origin, End));
+		FVector BeamEnd;
+		if (DistanceIsNan) {
+			BeamEnd = Origin + ShootDir * 2000.0f;
+		} else {
+			BeamEnd = End;
+		}
+
+		auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			TrailParticle,
+			Origin,
+			ShootDir.Rotation(),
+			FVector(1.0f, 1.0f, 1.0f),
+			true,
+			true,
+			ENCPoolMethod::AutoRelease,
+			true
+		);
+
+		Effect->SetNiagaraVariableVec3(TEXT("BeamEnd"), BeamEnd);
+	}
+
 	if (!Actor) {
 		return;
 	}
 	
-	FlushPersistentDebugLines(Actor->GetWorld());
-	DrawDebugLine(Actor->GetWorld(), Origin, TraceEnd, FColor::Black, true, 1.0f, 10.f);
+	//FlushPersistentDebugLines(Actor->GetWorld());
+	//DrawDebugLine(Actor->GetWorld(), Origin, TraceEnd, FColor::Black, true, 1.0f, 10.f);
 
 	UGameplayStatics::ApplyDamage(Actor, Damage, GetOwner()->GetInstigatorController(), this, DamageType);
 

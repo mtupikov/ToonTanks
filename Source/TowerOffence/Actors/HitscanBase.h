@@ -4,6 +4,8 @@
 #include "AmmunitionBase.h"
 #include "HitscanBase.generated.h"
 
+class UNiagaraSystem;
+
 UCLASS()
 class TOWEROFFENCE_API AHitscanBase : public AAmmunitionBase {
 	GENERATED_BODY()
@@ -14,6 +16,9 @@ public:
 	void Fire(const FVector& AimDirection, const FVector& StartLocation);
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UNiagaraSystem* TrailParticle = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float FireSpread = 0.0f;
 

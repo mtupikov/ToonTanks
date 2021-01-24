@@ -1,6 +1,5 @@
 #include "AmmunitionBase.h"
 
-#include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/DamageType.h"
 
 AAmmunitionBase::AAmmunitionBase() {
