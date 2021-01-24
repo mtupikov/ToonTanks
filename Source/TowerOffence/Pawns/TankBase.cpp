@@ -61,12 +61,21 @@ void ATankBase::MoveForward(float Value) {
 	}
 }
 
-void ATankBase::CheckFire() {
-	if (GetWorld()->GetTimerManager().IsTimerActive(FireRateTimerHandle)) {
-		return;
-	}
+void ATankBase::BeginFire() {
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATankBase::RealeseFire, GetFireRate(), true);
+}
 
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, GetFireRate(), false);
+void ATankBase::EndFire() {
+	GetWorld()->GetTimerManager().ClearTimer(FireRateTimerHandle);
+
+	if (!GetWorld()->GetTimerManager().IsTimerActive(SingleFireRateTimerHandle)) {
+		RealeseFire();
+	}
+}
+
+void ATankBase::RealeseFire() {
+	GetWorld()->GetTimerManager().SetTimer(SingleFireRateTimerHandle, GetFireRate(), false);
+
 	Fire();
 }
 
@@ -80,6 +89,6 @@ void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveForward", this, &ATankBase::MoveForward);
 	PlayerInputComponent->BindAxis("TurnBase", this, &ATankBase::RotateBase);
 	PlayerInputComponent->BindAxis("TurnTurret", this, &ATankBase::RotateTurret);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::CheckFire);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::CheckFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::BeginFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATankBase::EndFire);
 }

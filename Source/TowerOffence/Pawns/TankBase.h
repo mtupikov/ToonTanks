@@ -26,7 +26,9 @@ private:
 	void RotateBase(float Value);
 	void RotateTurret(float Value);
 	void MoveForward(float Value);
-	void CheckFire();
+	void BeginFire();
+	void EndFire();
+	void RealeseFire();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent = nullptr;
@@ -44,5 +46,6 @@ private:
 	float BaseRotationSpeed = 200.0f;
 
 	FTimerHandle FireRateTimerHandle;
+	FTimerHandle SingleFireRateTimerHandle;
 	APlayerController* PlayerController = nullptr;
 };
