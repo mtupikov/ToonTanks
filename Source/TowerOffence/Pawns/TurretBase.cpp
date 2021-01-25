@@ -4,7 +4,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "TowerOffence/Pawns/TankBase.h"
-#include "TowerOffence/Components/ShootProjectileComponent.h"
+#include "TowerOffence/Components/ShootAmmunitionComponent.h"
 
 ATurretBase::ATurretBase() {}
 
