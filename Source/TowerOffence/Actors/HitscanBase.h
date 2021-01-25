@@ -18,6 +18,9 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UNiagaraSystem* TrailParticle = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UParticleSystem* MuzzleFlashParticle = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float FireSpread = 0.0f;

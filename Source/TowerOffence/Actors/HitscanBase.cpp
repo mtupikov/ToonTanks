@@ -76,6 +76,8 @@ void AHitscanBase::ProcessInstantHit(
 
 	if (TrailParticle && TrailParticle->IsValid()) {
 		const auto DistanceIsNan = FGenericPlatformMath::IsNaN(FVector::Dist(Origin, End));
+		const auto ShootRotation = ShootDir.Rotation();
+
 		FVector BeamEnd;
 		if (DistanceIsNan) {
 			BeamEnd = Origin + ShootDir * 2000.0f;
@@ -83,11 +85,22 @@ void AHitscanBase::ProcessInstantHit(
 			BeamEnd = End;
 		}
 
+		auto* Muzzle = UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			MuzzleFlashParticle,
+			Origin,
+			ShootRotation,
+			FVector(1.0f, 1.0f, 1.0f),
+			true,
+			EPSCPoolMethod::AutoRelease,
+			true
+		);
+
 		auto* Effect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			TrailParticle,
 			Origin,
-			ShootDir.Rotation(),
+			ShootRotation,
 			FVector(1.0f, 1.0f, 1.0f),
 			true,
 			true,
