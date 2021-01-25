@@ -76,11 +76,7 @@ void AForceFieldBase::OnBeginOverlap(
 		return;
 	}
 	
-	FVector ImpactPoint;
-	const auto Distance = ForceFieldCollision->GetDistanceToCollision(Projectile->GetActorLocation(), ImpactPoint);
-	const auto IsNearZero = UKismetMathLibrary::NearlyEqual_FloatFloat(Distance, 0.000f);
-
-	if (IsNearZero) {
+	if (IsInside(Projectile->GetActorLocation())) {
 		return;
 	}
 
@@ -132,6 +128,12 @@ void AForceFieldBase::CreateImpact(const FVector& ImpactPoint) {
 		ImpactPoint
 	);
 	ActiveImpacts.Add(NewImpact->GetUniqueID(), NewImpact);
+}
+
+bool AForceFieldBase::IsInside(const FVector& Point) const {
+	FVector ImpactPoint;
+	const auto Distance = ForceFieldCollision->GetDistanceToCollision(Point, ImpactPoint);
+	return UKismetMathLibrary::NearlyEqual_FloatFloat(Distance, 0.000f);
 }
 
 bool AForceFieldBase::IsActive() const {

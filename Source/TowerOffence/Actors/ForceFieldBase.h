@@ -21,6 +21,7 @@ public:
 	void Deactivate();
 
 	void CreateImpact(const FVector& ImpactPoint);
+	bool IsInside(const FVector& Point) const;
 
 	bool IsActive() const;
 

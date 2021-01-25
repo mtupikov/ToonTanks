@@ -63,7 +63,7 @@ void AHitscanBase::ProcessInstantHit(
 
 		auto* ForceField = Cast<AForceFieldBase>(Actor);
 		if (ForceField) {
-			if (ForceField->IsActive()) {
+			if (ForceField->IsActive() && !ForceField->IsInside(Origin)) {
 				ForceField->CreateImpact(EndPoint);
 			} else {
 				Actor = nullptr;
