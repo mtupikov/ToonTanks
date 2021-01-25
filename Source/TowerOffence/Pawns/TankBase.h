@@ -4,6 +4,7 @@
 #include "PawnBase.h"
 #include "TankBase.generated.h"
 
+class AHUDBase;
 class UMatineeCameraShake;
 class USpringArmComponent;
 class UCameraComponent;
@@ -48,4 +49,5 @@ private:
 	FTimerHandle FireRateTimerHandle;
 	FTimerHandle SingleFireRateTimerHandle;
 	APlayerController* PlayerController = nullptr;
+	AHUDBase* TankHUD = nullptr;
 };

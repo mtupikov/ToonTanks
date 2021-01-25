@@ -5,6 +5,7 @@
 #include "Camera/CameraShake.h"
 
 #include "TowerOffence/Components/PawnMovementComponentBase.h"
+#include "TowerOffence/HUD/HUDBase.h"
 
 ATankBase::ATankBase() {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
@@ -27,6 +28,8 @@ void ATankBase::BeginPlay() {
 	FInputModeGameOnly InputMode;
 	InputMode.SetConsumeCaptureMouseDown(false);
 	PlayerController->SetInputMode(InputMode);
+
+	TankHUD = Cast<AHUDBase>(PlayerController->GetHUD());
 
 	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
 		GetPawnMovementComponent()->SetMoveSpeed(MoveSpeed);
@@ -81,6 +84,12 @@ void ATankBase::RealeseFire() {
 
 void ATankBase::Tick(float DeltaTime) {
 	APawnBase::Tick(DeltaTime);
+
+	if (TankHUD) {
+		const auto Speed = GetVelocity().Size();
+		const auto RoundedSpeed = FMath::RoundToFloat(Speed);
+		TankHUD->SetPlayerSpeed(RoundedSpeed);
+	}
 }
 
 void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
