@@ -57,6 +57,8 @@ void ATankBase::BeginPlay() {
 void ATankBase::HandleDestruction() {
 	APawnBase::HandleDestruction();
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraDeathShake);
+	GetWorld()->GetTimerManager().ClearTimer(FireRateTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(SingleFireRateTimerHandle);
 
 	SetIsAlive(false);
 	SetActorHiddenInGame(true);
