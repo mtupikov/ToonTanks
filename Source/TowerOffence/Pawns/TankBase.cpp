@@ -4,8 +4,14 @@
 #include "Camera/CameraComponent.h"
 #include "Camera/CameraShake.h"
 
+#include "TowerOffence/Actors/HitscanBase.h"
+#include "TowerOffence/Actors/MissleProjectile.h"
+#include "TowerOffence/Actors/HomingMissleProjectile.h"
 #include "TowerOffence/Components/PawnMovementComponentBase.h"
+#include "TowerOffence/Components/ShootAmmunitionComponent.h"
 #include "TowerOffence/HUD/HUDBase.h"
+#include "TowerOffence/Utils/CrosshairType.h"
+#include "TowerOffence/Utils/CrosshairManager.h"
 
 ATankBase::ATankBase() {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
@@ -33,6 +39,18 @@ void ATankBase::BeginPlay() {
 
 	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
 		GetPawnMovementComponent()->SetMoveSpeed(MoveSpeed);
+	}
+
+	const auto Ammunition = GetShootComponent()->GetAmmunition();
+	if (auto* Ptr = Ammunition.GetDefaultObject()) {
+		CrosshairType Type = CrosshairType::None;
+		if (Cast<AHitscanBase>(Ptr)) {
+			Type = CrosshairType::Bullet;
+		} else if (Cast<AHomingMissleProjectile>(Ptr) || Cast<AMissleProjectile>(Ptr)) {
+			Type = CrosshairType::Rocket;
+		}
+
+		TankHUD->GetCrosshairManager()->SetCrosshairType(Type);
 	}
 }
 
@@ -84,12 +102,6 @@ void ATankBase::RealeseFire() {
 
 void ATankBase::Tick(float DeltaTime) {
 	APawnBase::Tick(DeltaTime);
-
-	if (TankHUD) {
-		const auto Speed = GetVelocity().Size();
-		const auto RoundedSpeed = FMath::RoundToFloat(Speed);
-		TankHUD->SetPlayerSpeed(RoundedSpeed);
-	}
 }
 
 void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {

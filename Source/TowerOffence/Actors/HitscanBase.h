@@ -23,9 +23,6 @@ protected:
 	UParticleSystem* MuzzleFlashParticle = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float FireSpread = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float Range = 3000.0f;
 
 private:
@@ -34,7 +31,6 @@ private:
 		const TArray<FHitResult>& Impacts,
 		const FVector& Origin,
 		const FVector& End,
-		const FVector& ShootDir,
-		float Spread
+		const FVector& ShootDir
 	);
 };

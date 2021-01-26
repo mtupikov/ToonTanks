@@ -1,54 +1,116 @@
 #include "HUDBase.h"
 
 #include "Engine/Canvas.h"
+#include "Kismet/GameplayStatics.h"
 
-namespace {
-
-const auto CrosshairSize = 64;
-
-} // end anonymous namespace
+#include "TowerOffence/Pawns/PawnBase.h"
+#include "TowerOffence/Components/ShootAmmunitionComponent.h"
+#include "TowerOffence/Utils/CrosshairManager.h"
 
 AHUDBase::AHUDBase() {
 	PrimaryActorTick.bCanEverTick = false;
+
+	CrosshairManager = CreateDefaultSubobject<UCrosshairManager>(TEXT("Crosshair manager"));
 }
 
-void AHUDBase::SetPlayerSpeed(float Speed) {
-	if (PlayerSpeed != Speed) {
-		PlayerSpeed = Speed;
-	}
+UCrosshairManager* AHUDBase::GetCrosshairManager() const {
+	return CrosshairManager;
 }
 
-void AHUDBase::SetCrosshairTexture(UTexture* Texture) {
-	if (CrosshairTexture != Texture) {
-		CrosshairTexture = Texture;
-	}
+void AHUDBase::BeginPlay() {
+	PlayerPawn = Cast<APawnBase>(UGameplayStatics::GetPlayerPawn(this, 0));
 }
 
 void AHUDBase::DrawHUD() {
 	Super::DrawHUD();
 
+	const auto CurrentCrosshairType = CrosshairManager->GetCurrentCrosshairType();
+	const auto& Crosshair = CrosshairManager->GetCrosshair(CurrentCrosshairType);
+
 	const auto SizeX = Canvas->SizeX;
 	const auto SizeY = Canvas->SizeY;
-	const float CenterX = (SizeX / 2) - 8;
-	const float CenterY = (SizeY / 2) - 8;
+	const float CenterX = SizeX / 2;
+	const float CenterY = SizeY / 2;
+	const auto Offset = PlayerPawn->GetShootComponent()->GetFireSpreadRadius();
+	const auto Alpha = 0.55f - FMath::GetMappedRangeValueClamped({ 0.0f, 10.0f }, { 0.05f, 0.5f }, Offset);
 
-	CrosshairTexture = Cast<UTexture>(StaticLoadObject(UTexture::StaticClass(), nullptr, TEXT("Texture2D'/Game/Assets/Textures/T_Crosshair.T_Crosshair'")));
-	if (!CrosshairTexture) {
-		UE_LOG(LogTemp, Warning, TEXT("Cannot load crosshair texture"));
-		return;
+	if (Crosshair.CenterTexture) {
+		DrawTexture(
+			Crosshair.CenterTexture,
+			CenterX - Crosshair.Size / 2,
+			CenterY - Crosshair.Size / 2,
+			Crosshair.Size,
+			Crosshair.Size,
+			0,
+			0,
+			1,
+			1,
+			FLinearColor(0.0f, 0.0f, 0.0f, 0.5f),
+			EBlendMode::BLEND_Translucent
+		);
 	}
 
-	DrawTexture(
-		CrosshairTexture,
-		CenterX - CrosshairSize / 2,
-		CenterY - CrosshairSize / 2,
-		CrosshairSize,
-		CrosshairSize,
-		0,
-		0,
-		1,
-		1,
-		FLinearColor(0.0f, 0.0f, 0.0f, 0.5f),
-		EBlendMode::BLEND_Translucent
-	);
+	if (Crosshair.TopLeftTexture) {
+		DrawTexture(
+			Crosshair.TopLeftTexture,
+			CenterX - Crosshair.Size / 2 - Offset,
+			CenterY - Crosshair.Size / 2 - Offset,
+			Crosshair.Size,
+			Crosshair.Size,
+			0,
+			0,
+			1,
+			1,
+			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			EBlendMode::BLEND_Translucent
+		);
+	}
+
+	if (Crosshair.TopRightTexture) {
+		DrawTexture(
+			Crosshair.TopRightTexture,
+			CenterX - Crosshair.Size / 2 + Offset,
+			CenterY - Crosshair.Size / 2 - Offset,
+			Crosshair.Size,
+			Crosshair.Size,
+			0,
+			0,
+			1,
+			1,
+			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			EBlendMode::BLEND_Translucent
+		);
+	}
+
+	if (Crosshair.BottomLeftTexture) {
+		DrawTexture(
+			Crosshair.BottomLeftTexture,
+			CenterX - Crosshair.Size / 2 - Offset,
+			CenterY - Crosshair.Size / 2 + Offset,
+			Crosshair.Size,
+			Crosshair.Size,
+			0,
+			0,
+			1,
+			1,
+			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			EBlendMode::BLEND_Translucent
+		);
+	}
+
+	if (Crosshair.BottomRightTexture) {
+		DrawTexture(
+			Crosshair.BottomRightTexture,
+			CenterX - Crosshair.Size / 2 + Offset,
+			CenterY - Crosshair.Size / 2 + Offset,
+			Crosshair.Size,
+			Crosshair.Size,
+			0,
+			0,
+			1,
+			1,
+			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			EBlendMode::BLEND_Translucent
+		);
+	}
 }

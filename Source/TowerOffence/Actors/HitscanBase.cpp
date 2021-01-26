@@ -17,14 +17,10 @@ void AHitscanBase::Fire(const FVector& AimDirection, const FVector& StartLocatio
 		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 	}
 
-	const auto RandomSeed = FMath::Rand();
-	FRandomStream WeaponRandomStream(RandomSeed);
-	const float SpreadCone = FMath::DegreesToRadians(FireSpread * 0.5);
-	const auto ShootDir = WeaponRandomStream.VRandCone(AimDirection, SpreadCone, SpreadCone);
-	const auto EndTrace = StartLocation + ShootDir * Range;
+	const auto EndTrace = StartLocation + AimDirection * Range;
 	const auto Impacts = WeaponTrace(StartLocation, EndTrace);
 
-	ProcessInstantHit(Impacts, StartLocation, EndTrace, ShootDir, FireSpread);
+	ProcessInstantHit(Impacts, StartLocation, EndTrace, AimDirection);
 }
 
 TArray<FHitResult> AHitscanBase::WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const {
@@ -45,8 +41,7 @@ void AHitscanBase::ProcessInstantHit(
 	const TArray<FHitResult>& Impacts,
 	const FVector& Origin,
 	const FVector& End,
-	const FVector& ShootDir,
-	float Spread
+	const FVector& ShootDir
 ) {
 	FVector EndPoint;
 	FVector TraceEnd;
