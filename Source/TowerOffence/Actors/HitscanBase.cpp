@@ -32,7 +32,7 @@ TArray<FHitResult> AHitscanBase::WeaponTrace(const FVector& TraceFrom, const FVe
 	TraceParams.AddIgnoredActor(this);
 
 	TArray<FHitResult> Hits;
-	GetWorld()->LineTraceMultiByChannel(Hits, TraceFrom, TraceTo, ECC_GameTraceChannel1, TraceParams);
+	GetWorld()->LineTraceMultiByChannel(Hits, TraceFrom, TraceTo, ECC_Visibility, TraceParams);
 
 	return Hits;
 }
