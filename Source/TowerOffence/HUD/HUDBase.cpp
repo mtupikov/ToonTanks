@@ -24,6 +24,12 @@ void AHUDBase::BeginPlay() {
 void AHUDBase::DrawHUD() {
 	Super::DrawHUD();
 
+	if (PlayerPawn->IsAlive()) {
+		DrawCrosshair();
+	}
+}
+
+void AHUDBase::DrawCrosshair() {
 	const auto CurrentCrosshairType = CrosshairManager->GetCurrentCrosshairType();
 	const auto& Crosshair = CrosshairManager->GetCrosshair(CurrentCrosshairType);
 

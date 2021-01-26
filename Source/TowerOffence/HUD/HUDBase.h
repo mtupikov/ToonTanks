@@ -20,6 +20,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
 
+	void DrawCrosshair();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshair", meta = (AllowPrivateAccess = "true"))
 	UCrosshairManager* CrosshairManager = nullptr;
 
