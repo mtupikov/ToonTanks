@@ -50,6 +50,7 @@ void UHealthComponent::TakeDamage(
 	}
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+	HealthChangedEvent.Broadcast(Health);
 
 	if (Health == 0) {
 		GameMode->ActorDied(GetOwner());

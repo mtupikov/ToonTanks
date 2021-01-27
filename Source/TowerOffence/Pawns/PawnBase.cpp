@@ -47,6 +47,7 @@ void APawnBase::BeginPlay() {
 		SpawnInfo.bDeferConstruction = false;
 
 		ForceField = GetWorld()->SpawnActor<AForceFieldBase>(ForceFieldBP, SpawnInfo);
+		ForceField->Init(false);
 		ForceField->SetActorScale3D({4.3, 4.3, 4.3});
 		ForceField->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
@@ -60,6 +61,22 @@ void APawnBase::SetIsAlive(bool Value) {
 	if (bIsPawnAlive != Value) {
 		bIsPawnAlive = Value;
 	}
+}
+
+void APawnBase::ActivateForceField() {
+	if (!ForceField) {
+		return;
+	}
+
+	ForceField->Activate();
+}
+
+void APawnBase::DeactivateForceField() {
+	if (!ForceField) {
+		return;
+	}
+
+	ForceField->Deactivate();
 }
 
 bool APawnBase::ForceFieldIsActive() const {
@@ -91,6 +108,14 @@ float APawnBase::GetFireRate() const {
 
 float APawnBase::GetTurretRotationSpeed() const {
 	return TurretRotationSpeed;
+}
+
+float APawnBase::GetForceFieldLifetime() const {
+	return ForceFieldLifetime;
+}
+
+float APawnBase::GetForceFieldTimeout() const {
+	return ForceFieldTimeout;
 }
 
 UStaticMeshComponent* APawnBase::GetTurretMesh() const {

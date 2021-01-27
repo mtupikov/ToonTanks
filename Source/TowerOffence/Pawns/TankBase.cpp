@@ -102,6 +102,25 @@ void ATankBase::RealeseFire() {
 	Fire();
 }
 
+void ATankBase::RequestForceFieldActivation() {
+	auto& TimerManager = GetWorld()->GetTimerManager();
+
+	if (TimerManager.IsTimerActive(ForceFieldTimerHandle)) {
+		return;
+	}
+
+	ActivateForceField();
+	TimerManager.SetTimer(ForceFieldTimerHandle, this, &ATankBase::RequestForceFieldDeactivation, GetForceFieldLifetime(), false);
+}
+
+void ATankBase::RequestForceFieldDeactivation() {
+	auto& TimerManager = GetWorld()->GetTimerManager();
+
+	DeactivateForceField();
+	TimerManager.ClearTimer(ForceFieldTimerHandle);
+	TimerManager.SetTimer(ForceFieldTimerHandle, GetForceFieldTimeout(), false);
+}
+
 void ATankBase::Tick(float DeltaTime) {
 	APawnBase::Tick(DeltaTime);
 }
@@ -114,4 +133,5 @@ void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("TurnTurret", this, &ATankBase::RotateTurret);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATankBase::BeginFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATankBase::EndFire);
+	PlayerInputComponent->BindAction("ActivateForceField", IE_Pressed, this, &ATankBase::RequestForceFieldActivation);
 }

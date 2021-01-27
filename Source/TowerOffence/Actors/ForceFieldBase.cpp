@@ -22,8 +22,7 @@ AForceFieldBase::AForceFieldBase() {
 	ForceFieldMesh->SetupAttachment(ForceFieldCollision);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
-
-	OnTakeAnyDamage.AddDynamic(this, &AForceFieldBase::OnTakeDamage);
+	HealthComponent->OnHealthChanged().AddUFunction(this, FName("OnHealthChanged"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ImpactMeshAsset(TEXT("StaticMesh'/Game/Assets/Meshes/SM_ForceFieldImpact.SM_ForceFieldImpact'"));
 	if (ImpactMeshAsset.Succeeded()) {
@@ -31,23 +30,12 @@ AForceFieldBase::AForceFieldBase() {
 	}
 }
 
-void AForceFieldBase::OnTakeDamage(
-	AActor* DamagedActor,
-	float Damage,
-	const UDamageType* DamageType,
-	AController* InstigatedBy,
-	AActor* DamageCauser
-) {
-	if (Damage == 0
-		|| !DamagedActor
-		|| !DamageCauser
-		|| !DamageType
-		|| !InstigatedBy) {
-		return;
-	}
-
-	const auto DisintegrastionAmount = (Damage / 10) * DisintegrationAmountPerHit;
-	CurrentDisintegrationAmount += DisintegrastionAmount;
+void AForceFieldBase::OnHealthChanged(float Health) {
+	CurrentDisintegrationAmount = FMath::GetMappedRangeValueClamped(
+		{ 0.0f, HealthComponent->GetDefaultHealth() },
+		{ 0.0f, RelativeDisintegrationAmountMax },
+		HealthComponent->GetDefaultHealth() - Health
+	);
 
 	if (!DynamicForceFieldMaterial) {
 		CreateDynamicForceFieldMaterial();
@@ -84,32 +72,33 @@ void AForceFieldBase::OnBeginOverlap(
 	Projectile->OnHit(OtherComp, this, OverlappedComp, {}, SweepResult);
 }
 
-void AForceFieldBase::TimelineCallback(float Value) {
-	if (DisintegrationAnimationTimeline->IsReversing()) {
-		CurrentDisintegrationAmount = FMath::Clamp(CurrentDisintegrationAmount - Value / 10, 0.0f, 100.0f);
-	} else {
-		CurrentDisintegrationAmount += Value / 1000;
-	}
-
+void AForceFieldBase::ActivationTimelineCallback(float Value) {
+	CurrentDisintegrationAmount = FMath::GetMappedRangeValueClamped({ 0.0f, ActivationTime }, { 0.0f, RealDisintegrationAmountMax }, ActivationTime - Value);
 	DynamicForceFieldMaterial->SetScalarParameterValue(FName(TEXT("Amount")), CurrentDisintegrationAmount);
 }
 
-void AForceFieldBase::TimelineFinishedCallback() {
-	if (UKismetMathLibrary::NearlyEqual_FloatFloat(CurrentDisintegrationAmount, 0.000f)
-		|| UKismetMathLibrary::Greater_FloatFloat(HealthComponent->GetHealth(), 0.0f)) {
-		SetActorHiddenInGame(false);
-	} else {
-		SetActorHiddenInGame(true);
-	}
+void AForceFieldBase::DisintegrationTimelineCallback(float Value) {
+	CurrentDisintegrationAmount = FMath::GetMappedRangeValueClamped({ 0.0f, DisintegrationTime }, { 0.0f, RealDisintegrationAmountMax }, Value);
+	DynamicForceFieldMaterial->SetScalarParameterValue(FName(TEXT("Amount")), CurrentDisintegrationAmount);
+}
+
+void AForceFieldBase::DisintegrationTimelineFinishedCallback() {
+	SetActorHiddenInGame(true);
+}
+
+void AForceFieldBase::Init(bool ActiveOnSpawn) {
+	SetActorHiddenInGame(!ActiveOnSpawn);
 }
 
 void AForceFieldBase::Activate() {
+	SetActorHiddenInGame(false);
 	HealthComponent->ResetHealth();
-	DisintegrationAnimationTimeline->Reverse();
+	ActivationAnimationTimeline->PlayFromStart();
 }
 
 void AForceFieldBase::Deactivate() {
-	DisintegrationAnimationTimeline->PlayFromStart();
+	DisintegrationAnimationTimeline->SetPlaybackPosition(CurrentDisintegrationAmount, false);
+	DisintegrationAnimationTimeline->Play();
 }
 
 void AForceFieldBase::CreateImpact(const FVector& ImpactPoint) {
@@ -144,7 +133,46 @@ void AForceFieldBase::BeginPlay() {
 	Super::BeginPlay();
 
 	ForceFieldMaterial = ForceFieldMesh->GetMaterial(0);
+	CreateDynamicForceFieldMaterial();
 
+	InitActivationTimeline();
+	InitDisintegrationTimeline();
+}
+
+void AForceFieldBase::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+
+	ActivationAnimationTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
+	DisintegrationAnimationTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
+}
+
+void AForceFieldBase::RemoveFinishedImpact(uint32 Key) {
+	ActiveImpacts.Remove(Key);
+}
+
+void AForceFieldBase::CreateDynamicForceFieldMaterial() {
+	DynamicForceFieldMaterial = UMaterialInstanceDynamic::Create(ForceFieldMaterial, ForceFieldMesh);
+	ForceFieldMesh->SetMaterial(0, DynamicForceFieldMaterial);
+}
+
+void AForceFieldBase::InitActivationTimeline() {
+	FOnTimelineFloat OnTimelineCallback;
+
+	ActivationAnimationTimeline = NewObject<UTimelineComponent>(this, FName("Activation Animation Timeline"));
+	ActivationAnimationTimeline->CreationMethod = EComponentCreationMethod::Native;
+	ActivationAnimationTimeline->SetNetAddressable();
+
+	ActivationAnimationTimeline->SetLooping(false);
+	ActivationAnimationTimeline->SetTimelineLength(ActivationTime);
+	ActivationAnimationTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	ActivationAnimationTimeline->SetPlaybackPosition(0.0f, false);
+
+	OnTimelineCallback.BindUFunction(this, FName(TEXT("ActivationTimelineCallback")));
+	ActivationAnimationTimeline->AddInterpFloat(ActivationFloatCurve, OnTimelineCallback);
+	ActivationAnimationTimeline->RegisterComponent();
+}
+
+void AForceFieldBase::InitDisintegrationTimeline() {
 	FOnTimelineFloat OnTimelineCallback;
 	FOnTimelineEventStatic OnTimelineFinishedCallback;
 
@@ -157,24 +185,9 @@ void AForceFieldBase::BeginPlay() {
 	DisintegrationAnimationTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 	DisintegrationAnimationTimeline->SetPlaybackPosition(0.0f, false);
 
-	OnTimelineCallback.BindUFunction(this, FName(TEXT("TimelineCallback")));
-	OnTimelineFinishedCallback.BindUFunction(this, FName(TEXT("TimelineFinishedCallback")));
+	OnTimelineCallback.BindUFunction(this, FName(TEXT("DisintegrationTimelineCallback")));
+	OnTimelineFinishedCallback.BindUFunction(this, FName(TEXT("DisintegrationTimelineFinishedCallback")));
 	DisintegrationAnimationTimeline->AddInterpFloat(DisintegrationFloatCurve, OnTimelineCallback);
 	DisintegrationAnimationTimeline->SetTimelineFinishedFunc(OnTimelineFinishedCallback);
 	DisintegrationAnimationTimeline->RegisterComponent();
-}
-
-void AForceFieldBase::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-
-	DisintegrationAnimationTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
-}
-
-void AForceFieldBase::RemoveFinishedImpact(uint32 Key) {
-	ActiveImpacts.Remove(Key);
-}
-
-void AForceFieldBase::CreateDynamicForceFieldMaterial() {
-	DynamicForceFieldMaterial = UMaterialInstanceDynamic::Create(ForceFieldMaterial, ForceFieldMesh);
-	ForceFieldMesh->SetMaterial(0, DynamicForceFieldMaterial);
 }

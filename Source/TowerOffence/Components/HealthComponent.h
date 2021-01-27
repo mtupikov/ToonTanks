@@ -18,6 +18,11 @@ public:
 
 	void ResetHealth();
 
+	DECLARE_EVENT_OneParam(UHealthComponent, FHealthChangedEvent, float)
+	FHealthChangedEvent& OnHealthChanged() {
+		return HealthChangedEvent;
+	}
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -38,4 +43,5 @@ private:
 	float Health = 0.0f;
 
 	ATankGameModeBase* GameMode = nullptr;
+	FHealthChangedEvent HealthChangedEvent;
 };

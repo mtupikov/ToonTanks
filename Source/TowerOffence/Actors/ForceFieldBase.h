@@ -17,6 +17,8 @@ class TOWEROFFENCE_API AForceFieldBase : public AActor {
 public:
 	AForceFieldBase();
 
+	void Init(bool ActiveOnSpawn);
+
 	void Activate();
 	void Deactivate();
 
@@ -33,15 +35,11 @@ private:
 
 	void RemoveFinishedImpact(uint32 Key);
 	void CreateDynamicForceFieldMaterial();
+	void InitActivationTimeline();
+	void InitDisintegrationTimeline();
 
 	UFUNCTION()
-	void OnTakeDamage(
-		AActor* DamagedActor,
-		float Damage,
-		const UDamageType* DamageType,
-		AController* InstigatedBy,
-		AActor* DamageCauser
-	);
+	void OnHealthChanged(float Health);
 
 	UFUNCTION()
 	void OnBeginOverlap(
@@ -54,10 +52,13 @@ private:
 	);
 
 	UFUNCTION()
-	void TimelineCallback(float Value);
+	void ActivationTimelineCallback(float Value);
 
 	UFUNCTION()
-	void TimelineFinishedCallback();
+	void DisintegrationTimelineCallback(float Value);
+
+	UFUNCTION()
+	void DisintegrationTimelineFinishedCallback();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USphereComponent* ForceFieldCollision = nullptr;
@@ -67,6 +68,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* ActivationFloatCurve = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation", meta = (AllowPrivateAccess = "true"))
+	float ActivationTime = 1.0f; // when modifying - do not forget to change ActivationFloatCurve
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* ImpactFloatCurve = nullptr;
@@ -81,17 +88,20 @@ private:
 	float ImpactTime = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
-	float DisintegrationTime = 1.0f;
+	float DisintegrationTime = 1.0f; // when modifying - do not forget to change DisintegrationFloatCurve
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Impact Settings", meta = (AllowPrivateAccess = "true"))
-	float DisintegrationAmountPerHit = 0.020f;
+	float DisintegrationAmountPerHit = 0.1f;
 
 	UStaticMesh* ImpactMesh = nullptr;
 	TMap<uint32, UForceFieldImpact*> ActiveImpacts;
 	UMaterialInterface* ForceFieldMaterial = nullptr;
 	UMaterialInstanceDynamic* DynamicForceFieldMaterial = nullptr;
 	UTimelineComponent* DisintegrationAnimationTimeline = nullptr;
+	UTimelineComponent* ActivationAnimationTimeline = nullptr;
 	float CurrentDisintegrationAmount = 0.0f;
+	float RelativeDisintegrationAmountMax = 0.5f;
+	float RealDisintegrationAmountMax = 1.0f;
 
 	friend class UForceFieldImpact;
 };

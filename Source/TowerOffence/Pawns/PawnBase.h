@@ -28,9 +28,14 @@ public:
 	float GetFireRate() const;
 	float GetTurretRotationSpeed() const;
 
+	float GetForceFieldLifetime() const;
+	float GetForceFieldTimeout() const;
+
 	bool IsAlive() const;
 	void SetIsAlive(bool Value);
 
+	void ActivateForceField();
+	void DeactivateForceField();
 	bool ForceFieldIsActive() const;
 
 	UStaticMeshComponent* GetTurretMesh() const;
@@ -100,6 +105,12 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float TurretRotationSpeed = 60.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float ForceFieldLifetime = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float ForceFieldTimeout = 5.0f;
 
 	AForceFieldBase* ForceField = nullptr;
 	FRotator InitialRotator;

@@ -30,6 +30,8 @@ private:
 	void BeginFire();
 	void EndFire();
 	void RealeseFire();
+	void RequestForceFieldActivation();
+	void RequestForceFieldDeactivation();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent = nullptr;
@@ -48,6 +50,7 @@ private:
 
 	FTimerHandle FireRateTimerHandle;
 	FTimerHandle SingleFireRateTimerHandle;
+	FTimerHandle ForceFieldTimerHandle;
 	APlayerController* PlayerController = nullptr;
 	AHUDBase* TankHUD = nullptr;
 };
