@@ -68,7 +68,7 @@ void AForceFieldBase::OnBeginOverlap(
 		return;
 	}
 	
-	if (IsInside(Projectile->GetActorLocation())) {
+	if (IsInside(Projectile->GetActorLocation()) && IsFarEnough(Projectile->GetSpawnPoint(), 20.0f)) {
 		return;
 	}
 
@@ -148,6 +148,12 @@ void AForceFieldBase::Tick(float DeltaTime) {
 
 	ActivationAnimationTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
 	DisintegrationAnimationTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
+}
+
+bool AForceFieldBase::IsFarEnough(const FVector& Point, float Distance) const {
+	FVector ImpactPoint;
+	const auto DistanceToCollision = ForceFieldCollision->GetDistanceToCollision(Point, ImpactPoint);
+	return UKismetMathLibrary::GreaterEqual_FloatFloat(DistanceToCollision, Distance);
 }
 
 void AForceFieldBase::RemoveFinishedImpact(uint32 Key) {

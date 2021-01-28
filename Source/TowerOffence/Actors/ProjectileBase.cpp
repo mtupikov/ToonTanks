@@ -24,6 +24,8 @@ void AProjectileBase::BeginPlay() {
 	if (LaunchSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 	}
+
+	SpawnPoint = GetActorLocation();
 	GetWorld()->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::DestroyProjectile, LifeSpanTime, false);
 }
 
@@ -49,6 +51,10 @@ void AProjectileBase::OnHit(
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraHitShake);
 
 	DestroyProjectile();
+}
+
+FVector AProjectileBase::GetSpawnPoint() const {
+	return FVector();
 }
 
 void AProjectileBase::DestroyProjectile() {

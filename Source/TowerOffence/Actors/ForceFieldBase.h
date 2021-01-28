@@ -38,6 +38,8 @@ protected:
 private:
 	virtual void Tick(float DeltaTime) override;
 
+	bool IsFarEnough(const FVector& Point, float Distance) const;
+
 	void RemoveFinishedImpact(uint32 Key);
 	void CreateDynamicForceFieldMaterial();
 	void InitActivationTimeline();

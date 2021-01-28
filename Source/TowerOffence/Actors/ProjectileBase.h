@@ -15,6 +15,8 @@ class TOWEROFFENCE_API AProjectileBase : public AAmmunitionBase {
 public:
 	AProjectileBase();
 
+	FVector GetSpawnPoint() const;
+
 	virtual void DestroyProjectile();
 
 	UFUNCTION()
@@ -51,4 +53,5 @@ protected:
 	float LifeSpanTime = 3.0;
 	
 	FTimerHandle LifeSpanTimerHandle;
+	FVector SpawnPoint;
 };
