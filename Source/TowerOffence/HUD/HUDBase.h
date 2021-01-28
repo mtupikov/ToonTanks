@@ -6,6 +6,7 @@
 
 class APawnBase;
 class UCrosshairManager;
+class UUserWidget;
 
 UCLASS()
 class TOWEROFFENCE_API AHUDBase : public AHUD {
@@ -22,8 +23,12 @@ protected:
 
 	void DrawCrosshair();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> HealthClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshair", meta = (AllowPrivateAccess = "true"))
 	UCrosshairManager* CrosshairManager = nullptr;
 
+	UUserWidget* HealthWidget = nullptr;
 	APawnBase* PlayerPawn = nullptr;
 };

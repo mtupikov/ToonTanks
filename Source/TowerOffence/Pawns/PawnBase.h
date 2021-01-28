@@ -25,6 +25,9 @@ public:
 
 	static float MaximumRotationAngle();
 
+	UFUNCTION(BlueprintCallable)
+	float GetHealth() const;
+
 	float GetFireRate() const;
 	float GetTurretRotationSpeed() const;
 

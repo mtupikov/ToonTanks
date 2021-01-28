@@ -1,5 +1,6 @@
 #include "HUDBase.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Engine/Canvas.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -9,8 +10,6 @@
 
 AHUDBase::AHUDBase() {
 	PrimaryActorTick.bCanEverTick = false;
-
-	CrosshairManager = CreateDefaultSubobject<UCrosshairManager>(TEXT("Crosshair manager"));
 }
 
 UCrosshairManager* AHUDBase::GetCrosshairManager() const {
@@ -19,6 +18,14 @@ UCrosshairManager* AHUDBase::GetCrosshairManager() const {
 
 void AHUDBase::BeginPlay() {
 	PlayerPawn = Cast<APawnBase>(UGameplayStatics::GetPlayerPawn(this, 0));
+	CrosshairManager = NewObject<UCrosshairManager>(UCrosshairManager::StaticClass(), TEXT("Crosshair manager"));
+
+	if (HealthClass) {
+		if (auto* Widget = CreateWidget<UUserWidget>(GetWorld(), HealthClass)) {
+			HealthWidget = Widget;
+			HealthWidget->AddToViewport();
+		}
+	}
 }
 
 void AHUDBase::DrawHUD() {

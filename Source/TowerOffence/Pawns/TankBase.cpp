@@ -35,7 +35,9 @@ void ATankBase::BeginPlay() {
 	InputMode.SetConsumeCaptureMouseDown(false);
 	PlayerController->SetInputMode(InputMode);
 
-	TankHUD = Cast<AHUDBase>(PlayerController->GetHUD());
+	auto* BaseHUD = PlayerController->GetHUD();
+	TankHUD = Cast<AHUDBase>(BaseHUD);
+	ensure(TankHUD);
 
 	if (GetPawnMovementComponent() && (GetPawnMovementComponent()->UpdatedComponent == RootComponent)) {
 		GetPawnMovementComponent()->SetMoveSpeed(MoveSpeed);
@@ -50,7 +52,11 @@ void ATankBase::BeginPlay() {
 			Type = CrosshairType::Rocket;
 		}
 
-		TankHUD->GetCrosshairManager()->SetCrosshairType(Type);
+		if (auto* CrosshairManager = TankHUD->GetCrosshairManager()) {
+			CrosshairManager->SetCrosshairType(Type);
+		} else {
+			UE_LOG(LogTemp, Warning, TEXT("Cannot get crosshair manager"));
+		}
 	}
 }
 

@@ -102,6 +102,10 @@ void APawnBase::RotateTurretToTarget(
 	RotateTurret(Rotators.ResultRotator);
 }
 
+float APawnBase::GetHealth() const {
+	return HealthComponent->GetHealth();
+}
+
 float APawnBase::GetFireRate() const {
 	return ShootComponent->GetFireRate();
 }
