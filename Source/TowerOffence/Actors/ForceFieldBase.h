@@ -27,6 +27,11 @@ public:
 
 	bool IsActive() const;
 
+	DECLARE_EVENT(AForceFieldBase, FForceFieldDestroyed)
+	FForceFieldDestroyed& OnDestroyed() {
+		return ForceFieldDestroyedEvent;
+	}
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -102,6 +107,7 @@ private:
 	float CurrentDisintegrationAmount = 0.0f;
 	float RelativeDisintegrationAmountMax = 0.5f;
 	float RealDisintegrationAmountMax = 1.0f;
+	FForceFieldDestroyed ForceFieldDestroyedEvent;
 
 	friend class UForceFieldImpact;
 };

@@ -57,6 +57,8 @@ protected:
 		FRotator RightMaxRotator;
 	};
 
+	AForceFieldBase* GetForceField() const;
+
 	virtual void BeginPlay() override;
 	void RotateTurretToTarget(
 		const FVector& TargetLocation,

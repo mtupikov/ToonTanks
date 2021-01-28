@@ -28,6 +28,10 @@ APawnBase::APawnBase() {
 	MovementComponent->UpdatedComponent = RootComponent;
 }
 
+AForceFieldBase* APawnBase::GetForceField() const {
+	return ForceField;
+}
+
 void APawnBase::BeginPlay() {
 	Super::BeginPlay();
 

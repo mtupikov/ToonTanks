@@ -20,10 +20,19 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void HandleDestruction() override;
 
+	UFUNCTION(BlueprintCallable)
+	float GetForceFieldCurrentLifetime() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetForceFieldCurrentTimeout() const;
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	UFUNCTION()
+	void OnForceFieldDestroyed();
+
 	void RotateBase(float Value);
 	void RotateTurret(float Value);
 	void MoveForward(float Value);
@@ -50,7 +59,8 @@ private:
 
 	FTimerHandle FireRateTimerHandle;
 	FTimerHandle SingleFireRateTimerHandle;
-	FTimerHandle ForceFieldTimerHandle;
+	FTimerHandle ForceFieldLifetimeTimerHandle;
+	FTimerHandle ForceFieldTimeoutTimerHandle;
 	APlayerController* PlayerController = nullptr;
 	AHUDBase* TankHUD = nullptr;
 };

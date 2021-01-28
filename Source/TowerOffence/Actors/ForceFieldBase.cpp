@@ -31,6 +31,10 @@ AForceFieldBase::AForceFieldBase() {
 }
 
 void AForceFieldBase::OnHealthChanged(float Health) {
+	if (FMath::IsNearlyZero(Health)) {
+		ForceFieldDestroyedEvent.Broadcast();
+	}
+
 	CurrentDisintegrationAmount = FMath::GetMappedRangeValueClamped(
 		{ 0.0f, HealthComponent->GetDefaultHealth() },
 		{ 0.0f, RelativeDisintegrationAmountMax },

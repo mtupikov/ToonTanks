@@ -7,6 +7,7 @@
 #include "TowerOffence/Actors/HitscanBase.h"
 #include "TowerOffence/Actors/MissleProjectile.h"
 #include "TowerOffence/Actors/HomingMissleProjectile.h"
+#include "TowerOffence/Actors/ForceFieldBase.h"
 #include "TowerOffence/Components/PawnMovementComponentBase.h"
 #include "TowerOffence/Components/ShootAmmunitionComponent.h"
 #include "TowerOffence/HUD/HUDBase.h"
@@ -58,17 +59,44 @@ void ATankBase::BeginPlay() {
 			UE_LOG(LogTemp, Warning, TEXT("Cannot get crosshair manager"));
 		}
 	}
+
+	auto* FField = GetForceField();
+	FField->OnDestroyed().AddUFunction(this, FName("OnForceFieldDestroyed"));
 }
 
 void ATankBase::HandleDestruction() {
 	APawnBase::HandleDestruction();
+
+	auto& TimerManager = GetWorld()->GetTimerManager();
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraDeathShake);
-	GetWorld()->GetTimerManager().ClearTimer(FireRateTimerHandle);
-	GetWorld()->GetTimerManager().ClearTimer(SingleFireRateTimerHandle);
+	TimerManager.ClearTimer(FireRateTimerHandle);
+	TimerManager.ClearTimer(SingleFireRateTimerHandle);
+	TimerManager.ClearTimer(ForceFieldLifetimeTimerHandle);
+	TimerManager.ClearTimer(ForceFieldTimeoutTimerHandle);
 
 	SetIsAlive(false);
 	SetActorHiddenInGame(true);
 	SetActorTickEnabled(false);
+}
+
+float ATankBase::GetForceFieldCurrentLifetime() const {
+	auto& TimerManager = GetWorld()->GetTimerManager();
+	if (!TimerManager.IsTimerActive(ForceFieldLifetimeTimerHandle)) {
+		return 0.0f;
+	}
+
+	const auto Elapsed = TimerManager.GetTimerElapsed(ForceFieldLifetimeTimerHandle);
+	return FMath::GetMappedRangeValueClamped({ 0.0f, GetForceFieldLifetime() }, { 0.0f, 1.0f }, Elapsed);
+}
+
+float ATankBase::GetForceFieldCurrentTimeout() const {
+	auto& TimerManager = GetWorld()->GetTimerManager();
+	if (!TimerManager.IsTimerActive(ForceFieldTimeoutTimerHandle)) {
+		return 0.0f;
+	}
+
+	const auto Elapsed = TimerManager.GetTimerElapsed(ForceFieldTimeoutTimerHandle);
+	return FMath::GetMappedRangeValueClamped({ 0.0f, GetForceFieldTimeout() }, { 0.0f, 1.0f }, Elapsed);
 }
 
 void ATankBase::RotateBase(float Value) {
@@ -111,20 +139,27 @@ void ATankBase::RealeseFire() {
 void ATankBase::RequestForceFieldActivation() {
 	auto& TimerManager = GetWorld()->GetTimerManager();
 
-	if (TimerManager.IsTimerActive(ForceFieldTimerHandle)) {
+	if (TimerManager.IsTimerActive(ForceFieldTimeoutTimerHandle)) {
 		return;
 	}
 
 	ActivateForceField();
-	TimerManager.SetTimer(ForceFieldTimerHandle, this, &ATankBase::RequestForceFieldDeactivation, GetForceFieldLifetime(), false);
+	TimerManager.ClearTimer(ForceFieldTimeoutTimerHandle);
+	TimerManager.SetTimer(ForceFieldLifetimeTimerHandle, this, &ATankBase::RequestForceFieldDeactivation, GetForceFieldLifetime(), false);
 }
 
 void ATankBase::RequestForceFieldDeactivation() {
 	auto& TimerManager = GetWorld()->GetTimerManager();
 
 	DeactivateForceField();
-	TimerManager.ClearTimer(ForceFieldTimerHandle);
-	TimerManager.SetTimer(ForceFieldTimerHandle, GetForceFieldTimeout(), false);
+	TimerManager.ClearTimer(ForceFieldLifetimeTimerHandle);
+	TimerManager.SetTimer(ForceFieldTimeoutTimerHandle, GetForceFieldTimeout(), false);
+}
+
+void ATankBase::OnForceFieldDestroyed() {
+	auto& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.ClearTimer(ForceFieldLifetimeTimerHandle);
+	TimerManager.SetTimer(ForceFieldTimeoutTimerHandle, GetForceFieldTimeout(), false);
 }
 
 void ATankBase::Tick(float DeltaTime) {

@@ -20,6 +20,19 @@ void AHUDBase::BeginPlay() {
 	PlayerPawn = Cast<APawnBase>(UGameplayStatics::GetPlayerPawn(this, 0));
 	CrosshairManager = NewObject<UCrosshairManager>(UCrosshairManager::StaticClass(), TEXT("Crosshair manager"));
 
+	InitHealthBarWidget();
+	InitActionsPanelWidget();
+}
+
+void AHUDBase::DrawHUD() {
+	Super::DrawHUD();
+
+	if (PlayerPawn->IsAlive()) {
+		DrawCrosshair();
+	}
+}
+
+void AHUDBase::InitHealthBarWidget() {
 	if (HealthClass) {
 		if (auto* Widget = CreateWidget<UUserWidget>(GetWorld(), HealthClass)) {
 			HealthWidget = Widget;
@@ -28,11 +41,12 @@ void AHUDBase::BeginPlay() {
 	}
 }
 
-void AHUDBase::DrawHUD() {
-	Super::DrawHUD();
-
-	if (PlayerPawn->IsAlive()) {
-		DrawCrosshair();
+void AHUDBase::InitActionsPanelWidget() {
+	if (PanelClass) {
+		if (auto* Widget = CreateWidget<UUserWidget>(GetWorld(), PanelClass)) {
+			PanelWidget = Widget;
+			PanelWidget->AddToViewport();
+		}
 	}
 }
 
