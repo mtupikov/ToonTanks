@@ -139,7 +139,7 @@ void ATankBase::RealeseFire() {
 void ATankBase::RequestForceFieldActivation() {
 	auto& TimerManager = GetWorld()->GetTimerManager();
 
-	if (TimerManager.IsTimerActive(ForceFieldTimeoutTimerHandle)) {
+	if (TimerManager.IsTimerActive(ForceFieldTimeoutTimerHandle) || TimerManager.IsTimerActive(ForceFieldLifetimeTimerHandle)) {
 		return;
 	}
 
