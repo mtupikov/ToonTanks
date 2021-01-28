@@ -16,6 +16,10 @@ UCrosshairManager* AHUDBase::GetCrosshairManager() const {
 	return CrosshairManager;
 }
 
+void AHUDBase::EnemyDamaged() {
+	GetWorld()->GetTimerManager().SetTimer(EnemyDamagedTimerHandle, 0.3f, false);
+}
+
 void AHUDBase::BeginPlay() {
 	PlayerPawn = Cast<APawnBase>(UGameplayStatics::GetPlayerPawn(this, 0));
 	CrosshairManager = NewObject<UCrosshairManager>(UCrosshairManager::StaticClass(), TEXT("Crosshair manager"));
@@ -54,12 +58,20 @@ void AHUDBase::DrawCrosshair() {
 	const auto CurrentCrosshairType = CrosshairManager->GetCurrentCrosshairType();
 	const auto& Crosshair = CrosshairManager->GetCrosshair(CurrentCrosshairType);
 
+	FLinearColor CrosshairColor;
 	const auto SizeX = Canvas->SizeX;
 	const auto SizeY = Canvas->SizeY;
 	const float CenterX = SizeX / 2;
 	const float CenterY = SizeY / 2;
-	const auto Offset = PlayerPawn->GetShootComponent()->GetFireSpreadRadius();
+	auto Offset = PlayerPawn->GetShootComponent()->GetFireSpreadRadius();
 	const auto Alpha = 0.55f - FMath::GetMappedRangeValueClamped({ 0.0f, 10.0f }, { 0.05f, 0.5f }, Offset);
+
+	if (GetWorld()->GetTimerManager().IsTimerActive(EnemyDamagedTimerHandle)) {
+		Offset += 3.0f;
+		CrosshairColor = FLinearColor(1.0f, 0.0f, 0.0f, Alpha);
+	} else {
+		CrosshairColor = FLinearColor(0.0f, 0.0f, 0.0f, Alpha);
+	}
 
 	if (Crosshair.CenterTexture) {
 		DrawTexture(
@@ -88,7 +100,7 @@ void AHUDBase::DrawCrosshair() {
 			0,
 			1,
 			1,
-			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			CrosshairColor,
 			EBlendMode::BLEND_Translucent
 		);
 	}
@@ -104,7 +116,7 @@ void AHUDBase::DrawCrosshair() {
 			0,
 			1,
 			1,
-			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			CrosshairColor,
 			EBlendMode::BLEND_Translucent
 		);
 	}
@@ -120,7 +132,7 @@ void AHUDBase::DrawCrosshair() {
 			0,
 			1,
 			1,
-			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			CrosshairColor,
 			EBlendMode::BLEND_Translucent
 		);
 	}
@@ -136,7 +148,7 @@ void AHUDBase::DrawCrosshair() {
 			0,
 			1,
 			1,
-			FLinearColor(0.0f, 0.0f, 0.0f, Alpha),
+			CrosshairColor,
 			EBlendMode::BLEND_Translucent
 		);
 	}

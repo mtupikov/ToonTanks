@@ -37,10 +37,16 @@ void UShootAmmunitionComponent::Fire(const FVector& SpawnLocation, const FRotato
 	}
 
 	auto* Ammunition = GetWorld()->SpawnActor<AAmmunitionBase>(ProjectileClass, SpawnLocation, ShootDir);
-	Ammunition->SetOwner(Owner);
 	if (!Ammunition) {
 		UE_LOG(LogTemp, Error, TEXT("Cannot spawn AAmmunitionBase class, oops! Owner: %s"), *Owner->GetName());
 		return;
+	}
+
+	Ammunition->SetOwner(Owner);
+	for (const auto& Tag : Owner->Tags) {
+		if (Tag == FName("Player") || Tag == FName("Enemy")) {
+			Ammunition->Tags.Add(Tag);
+		}
 	}
 
 	if (auto* Hitscan = Cast<AHitscanBase>(Ammunition)) {

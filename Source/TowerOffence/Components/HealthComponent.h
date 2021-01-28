@@ -5,6 +5,7 @@
 #include "HealthComponent.generated.h"
 
 class ATankGameModeBase;
+class AHUDBase;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TOWEROFFENCE_API UHealthComponent : public UActorComponent {
@@ -43,5 +44,6 @@ private:
 	float Health = 0.0f;
 
 	ATankGameModeBase* GameMode = nullptr;
+	AHUDBase* HUD = nullptr;
 	FHealthChangedEvent HealthChangedEvent;
 };

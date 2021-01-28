@@ -17,6 +17,8 @@ public:
 
 	UCrosshairManager* GetCrosshairManager() const;
 
+	void EnemyDamaged();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
@@ -38,4 +40,5 @@ protected:
 	UUserWidget* HealthWidget = nullptr;
 	UUserWidget* PanelWidget = nullptr;
 	APawnBase* PlayerPawn = nullptr;
+	FTimerHandle EnemyDamagedTimerHandle;
 };

@@ -1,6 +1,7 @@
 #include "HealthComponent.h"
 
 #include "TowerOffence/GameModes/TankGameModeBase.h"
+#include "TowerOffence/HUD/HUDBase.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -26,6 +27,12 @@ void UHealthComponent::BeginPlay() {
 	Health = DefaultHealth;
 	GameMode = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage);
+
+	auto* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	auto* PlayerController = Cast<APlayerController>(Player->GetController());
+	auto* BaseHUD = PlayerController->GetHUD();
+	HUD = Cast<AHUDBase>(BaseHUD);
+	ensure(HUD);
 }
 
 void UHealthComponent::TakeDamage(
@@ -51,6 +58,12 @@ void UHealthComponent::TakeDamage(
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 	HealthChangedEvent.Broadcast(Health);
+
+	const auto CauserActorTags = DamageCauser->Tags;
+	const auto DamagedActorTags = DamagedActor->Tags;
+	if (CauserActorTags.Contains(TEXT("Player")) && DamagedActorTags.Contains(TEXT("Enemy"))) {
+		HUD->EnemyDamaged();
+	}
 
 	if (Health == 0) {
 		GameMode->ActorDied(GetOwner());

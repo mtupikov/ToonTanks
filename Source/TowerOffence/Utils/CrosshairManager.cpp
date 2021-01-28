@@ -12,7 +12,8 @@ TMap<CrosshairType, FCrosshair> CreateCrosshairs() {
 	BulletCrosshair.Size = 40;
 
 	const TMap<CrosshairType, FCrosshair> Map {
-		{ CrosshairType::Bullet, BulletCrosshair }
+		{ CrosshairType::Bullet, BulletCrosshair },
+		{ CrosshairType::Rocket, BulletCrosshair }
 	};
 
 	return Map;
