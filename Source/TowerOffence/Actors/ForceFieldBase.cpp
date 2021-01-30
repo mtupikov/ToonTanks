@@ -4,6 +4,7 @@
 #include "Components/TimelineComponent.h"
 #include "Curves/CurveFloat.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Misc/Guid.h"
 
 #include "ProjectileBase.h"
 #include "TowerOffence/Components/HealthComponent.h"
@@ -106,7 +107,7 @@ void AForceFieldBase::Deactivate() {
 }
 
 void AForceFieldBase::CreateImpact(const FVector& ImpactPoint) {
-	const auto ImpactName = FString::Printf(TEXT("Impact %d"), ActiveImpacts.Num());
+	const auto ImpactName = FString::Printf(TEXT("Impact %s"), *FGuid::NewGuid().ToString());
 	auto* NewImpact = NewObject<UForceFieldImpact>(this, UForceFieldImpact::StaticClass(), FName(ImpactName));
 	if (!NewImpact) {
 		return;
