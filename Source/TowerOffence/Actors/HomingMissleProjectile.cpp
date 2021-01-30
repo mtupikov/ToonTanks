@@ -7,7 +7,8 @@ AHomingMissleProjectile::AHomingMissleProjectile() : AMissleProjectile() {
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->bInitialVelocityInLocalSpace = true;
 	ProjectileMovement->bIsHomingProjectile = true;
-	ProjectileMovement->ProjectileGravityScale = 0.05f;
+	ProjectileMovement->ProjectileGravityScale = 0.02f;
+	ProjectileMovement->HomingAccelerationMagnitude = 7000.0f;
 }
 
 void AHomingMissleProjectile::SetHomingTarget(USceneComponent* Target) {
