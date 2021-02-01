@@ -5,6 +5,7 @@
 #include "AmmunitionBase.generated.h"
 
 class UDamageType;
+class AExplosion;
 
 UCLASS()
 class TOWEROFFENCE_API AAmmunitionBase : public AActor {
@@ -29,6 +30,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	USoundBase* LaunchSound = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Explosion", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AExplosion> Explosion;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UDamageType> DamageType;

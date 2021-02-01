@@ -3,6 +3,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Explosion.h"
 #include "TowerOffence/Utils/AmmunitionUtils.h"
 
 AGrenadeBase::AGrenadeBase() {
@@ -40,6 +41,12 @@ void AGrenadeBase::Detonate() {
 	}
 
 	AmmunitionUtils::DamageActorsInSphere(this, AreaDamage, AreaDamageDistance, DamageType);
+
+	if (Explosion) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		GetWorld()->SpawnActor<AExplosion>(Explosion, GetActorLocation(), GetActorRotation(), SpawnParams);
+	}
 
 	Destroy();
 }

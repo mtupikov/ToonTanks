@@ -7,6 +7,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "Explosion.h"
+
 AProjectileBase::AProjectileBase() {
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileBase::OnHit);
@@ -58,6 +60,12 @@ void AProjectileBase::Detonate() {
 	}
 	if (HitParticle) {
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
+	}
+
+	if (Explosion) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		GetWorld()->SpawnActor<AExplosion>(Explosion, GetActorLocation(), GetActorRotation(), SpawnParams);
 	}
 
 	Destroy();
