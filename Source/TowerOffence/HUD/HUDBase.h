@@ -9,6 +9,7 @@ class APawnBase;
 class UCrosshairManager;
 class UUserWidget;
 struct FBulletCrosshair;
+struct FMissleCrosshair;
 struct FGrenadeCrosshair;
 
 UCLASS()
@@ -32,6 +33,7 @@ protected:
 
 	void DrawCrosshair();
 	void DrawBulletCrosshair(const TSharedPtr<FBulletCrosshair>& Crosshair);
+	void DrawMissleCrosshair(const TSharedPtr<FMissleCrosshair>& Crosshair);
 	void DrawGrenadeCrosshair(const TSharedPtr<FGrenadeCrosshair>& Crosshair);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (AllowPrivateAccess = "true"))
