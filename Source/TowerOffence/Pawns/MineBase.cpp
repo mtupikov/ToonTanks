@@ -2,6 +2,7 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "TowerOffence/Actors/Explosion.h"
 #include "TowerOffence/Pawns/TankBase.h"
 #include "TowerOffence/Components/HealthComponent.h"
 
@@ -72,6 +73,12 @@ void AMineBase::BlowUp() {
 		}
 
 		UGameplayStatics::ApplyDamage(Actor, AreaDamage, GetOwner()->GetInstigatorController(), this, DamageType);
+	}
+
+	if (Explosion) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		GetWorld()->SpawnActor<AExplosion>(Explosion, GetActorLocation(), GetActorRotation(), SpawnParams);
 	}
 
 	Destroy();

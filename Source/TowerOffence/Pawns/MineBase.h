@@ -4,6 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "MineBase.generated.h"
 
+class AExplosion;
 class ATankBase;
 class USoundBase;
 class UStaticMeshComponent;
@@ -51,6 +52,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* DetonationParticle = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Explosion", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AExplosion> Explosion;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UDamageType> DamageType;
