@@ -184,6 +184,15 @@ void APawnBase::Fire(USceneComponent* Target) {
 	ShootComponent->Fire(FireSpawnPoint->GetComponentLocation(), FireSpawnPoint->GetComponentRotation(), this, Target);
 }
 
+void APawnBase::FireCharged(float Charge, USceneComponent* Target) {
+	if (!ShootComponent) {
+		UE_LOG(LogTemp, Warning, TEXT("Cannot fire, ShootComponent is null"), *GetName());
+		return;
+	}
+
+	ShootComponent->Fire(FireSpawnPoint->GetComponentLocation(), FireSpawnPoint->GetComponentRotation(), this, Target, Charge);
+}
+
 FRotator APawnBase::GetTurretRotation() const {
 	return TurretMesh->GetComponentRotation();
 }

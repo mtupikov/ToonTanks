@@ -3,6 +3,7 @@
 #include "TowerOffence/Actors/AmmunitionBase.h"
 #include "TowerOffence/Actors/HitscanBase.h"
 #include "TowerOffence/Actors/HomingMissleProjectile.h"
+#include "TowerOffence/Actors/GrenadeBase.h"
 #include "TowerOffence/Utils/WeaponSpreadManager.h"
 
 #include "DrawDebugHelpers.h"
@@ -11,7 +12,7 @@ UShootAmmunitionComponent::UShootAmmunitionComponent() {
 	WeaponSpreadManager = CreateDefaultSubobject<UWeaponSpreadManager>(TEXT("Weapon Spread Manager"));
 }
 
-void UShootAmmunitionComponent::Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target) {
+void UShootAmmunitionComponent::Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target, float Charge) {
 	if (!ProjectileClass) {
 		UE_LOG(LogTemp, Warning, TEXT("Projectile was not set in %s component"), *GetName());
 		return;
@@ -55,6 +56,10 @@ void UShootAmmunitionComponent::Fire(const FVector& SpawnLocation, const FRotato
 		return;
 	}
 
+	if (auto* Grenade = Cast<AGrenadeBase>(Ammunition)) {
+		Grenade->SetThrowPower(Charge);
+	}
+
 	if (auto* Homing = Cast<AHomingMissleProjectile>(Ammunition)) {
 		Homing->SetHomingTarget(Target);
 	}
@@ -70,18 +75,27 @@ void UShootAmmunitionComponent::SetAmmunition(TSubclassOf<AAmmunitionBase> Proje
 	if (auto* Ptr = Projectile.GetDefaultObject()) {
 		float MaxShots = 0.0f;
 		float SpreadDecrease = 0.0f;
+		float SpreadRadiusCoef = 1.0f;
 
 		if (Cast<AHitscanBase>(Ptr)) {
 			MaxShots = 5.0f;
 			SpreadDecrease = 0.025;
+			SpreadRadiusCoef = 2.0f;
 		} else if (Cast<AHomingMissleProjectile>(Ptr) || Cast<AMissleProjectile>(Ptr)) {
 			CachedHitscan = nullptr;
 			SpreadDecrease = 0.01;
 			MaxShots = 2.0f;
+			SpreadRadiusCoef = 4.0f;
+		} else if (Cast<AGrenadeBase>(Ptr)) {
+			CachedHitscan = nullptr;
+			SpreadDecrease = 0.001;
+			MaxShots = 2.0f;
+			SpreadRadiusCoef = 4.0f;
 		}
 
 		WeaponSpreadManager->SetSpreadDecreaseValue(SpreadDecrease);
 		WeaponSpreadManager->SetMaxShots(MaxShots);
+		WeaponSpreadManager->SetSpreadRadiusCoef(SpreadRadiusCoef);
 	}
 }
 

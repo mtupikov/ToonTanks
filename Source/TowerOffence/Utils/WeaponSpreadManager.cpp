@@ -18,13 +18,19 @@ void UWeaponSpreadManager::SetSpreadDecreaseValue(float Value) {
 	}
 }
 
+void UWeaponSpreadManager::SetSpreadRadiusCoef(float Value) {
+	if (SpreadRadiusCoef != Value) {
+		SpreadRadiusCoef = Value;
+	}
+}
+
 void UWeaponSpreadManager::OnShotFired() {
 	ShotCounter += 1.0f;
 	ShotCounter = FMath::Clamp(ShotCounter, 0.0f, MaxShots);
 }
 
 float UWeaponSpreadManager::GetSpreadRadius() const {
-	return ShotCounter * 2.0f;
+	return ShotCounter * SpreadRadiusCoef;
 }
 
 void UWeaponSpreadManager::Tick(float DeltaTime) {

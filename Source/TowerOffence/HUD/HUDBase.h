@@ -2,11 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Templates/SharedPointer.h"
 #include "HUDBase.generated.h"
 
 class APawnBase;
 class UCrosshairManager;
 class UUserWidget;
+struct FBulletCrosshair;
+struct FGrenadeCrosshair;
 
 UCLASS()
 class TOWEROFFENCE_API AHUDBase : public AHUD {
@@ -18,6 +21,7 @@ public:
 	UCrosshairManager* GetCrosshairManager() const;
 
 	void EnemyDamaged();
+	void SetCrosshairCharge(float Value);
 
 protected:
 	virtual void BeginPlay() override;
@@ -27,6 +31,8 @@ protected:
 	void InitActionsPanelWidget();
 
 	void DrawCrosshair();
+	void DrawBulletCrosshair(const TSharedPtr<FBulletCrosshair>& Crosshair);
+	void DrawGrenadeCrosshair(const TSharedPtr<FGrenadeCrosshair>& Crosshair);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> HealthClass;
@@ -41,4 +47,5 @@ protected:
 	UUserWidget* PanelWidget = nullptr;
 	APawnBase* PlayerPawn = nullptr;
 	FTimerHandle EnemyDamagedTimerHandle;
+	float CrosshairCharge = 0.0f;
 };

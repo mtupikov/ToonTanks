@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Templates/SharedPointer.h"
 
 #include "Crosshair.h"
 #include "CrosshairType.h"
@@ -15,11 +16,11 @@ class TOWEROFFENCE_API UCrosshairManager : public UObject {
 public:
 	UCrosshairManager();
 
-	const FCrosshair& GetCrosshair(CrosshairType Type);
+	const TSharedPtr<FCrosshairBase>& GetCrosshair(CrosshairType Type);
 	CrosshairType GetCurrentCrosshairType();
 	void SetCrosshairType(CrosshairType Type);
 
 private:
-	TMap<CrosshairType, FCrosshair> Crosshairs;
+	TMap<CrosshairType, TSharedPtr<FCrosshairBase>> Crosshairs;
 	CrosshairType CurrentCrosshairType;
 };

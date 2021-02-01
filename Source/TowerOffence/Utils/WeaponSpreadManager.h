@@ -17,6 +17,7 @@ public:
 	void SetPlayerSpeed(float Speed);
 	void SetMaxShots(float Shots);
 	void SetSpreadDecreaseValue(float Value);
+	void SetSpreadRadiusCoef(float Value);
 	void OnShotFired();
 
 	float GetSpreadRadius() const;
@@ -29,4 +30,5 @@ private:
 	float ShotCounter = 0.0f;
 	float MaxShots = 0.0f;
 	float SpreadDecreaseValue = 0.0f;
+	float SpreadRadiusCoef = 1.0f;
 };

@@ -8,6 +8,7 @@ class AHUDBase;
 class UMatineeCameraShake;
 class USpringArmComponent;
 class UCameraComponent;
+enum class CrosshairType;
 
 UCLASS()
 class TOWEROFFENCE_API ATankBase : public APawnBase {
@@ -41,6 +42,10 @@ private:
 	void RealeseFire();
 	void RequestForceFieldActivation();
 	void RequestForceFieldDeactivation();
+	void BeginDelayedFire();
+	void EndDelayedFire();
+	void BeginChargedFire();
+	void EndChargedFire();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComponent = nullptr;
@@ -59,8 +64,10 @@ private:
 
 	FTimerHandle FireRateTimerHandle;
 	FTimerHandle SingleFireRateTimerHandle;
+	FTimerHandle ChargedFireTimerHandle;
 	FTimerHandle ForceFieldLifetimeTimerHandle;
 	FTimerHandle ForceFieldTimeoutTimerHandle;
 	APlayerController* PlayerController = nullptr;
 	AHUDBase* TankHUD = nullptr;
+	CrosshairType Crosshair;
 };

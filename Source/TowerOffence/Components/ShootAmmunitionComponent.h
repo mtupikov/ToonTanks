@@ -15,7 +15,7 @@ class TOWEROFFENCE_API UShootAmmunitionComponent : public UActorComponent {
 public:
 	UShootAmmunitionComponent();
 
-	void Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target = nullptr);
+	void Fire(const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* Owner, USceneComponent* Target = nullptr, float Charge = 0.0f);
 
 	TSubclassOf<AAmmunitionBase> GetAmmunition() const;
 	void SetAmmunition(TSubclassOf<AAmmunitionBase> Projectile);

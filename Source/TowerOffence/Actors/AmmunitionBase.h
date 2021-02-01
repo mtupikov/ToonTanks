@@ -14,6 +14,9 @@ public:
 	AAmmunitionBase();
 
 	float GetFireRate() const;
+	const FVector& GetSpawnPoint() const;
+
+	virtual void Detonate();
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,4 +38,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
 	float Damage = 50.0f;
+
+private:
+	FVector SpawnPoint;
 };

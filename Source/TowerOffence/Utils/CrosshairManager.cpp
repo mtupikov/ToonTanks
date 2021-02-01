@@ -2,18 +2,28 @@
 
 namespace {
 
-TMap<CrosshairType, FCrosshair> CreateCrosshairs() {
-	FCrosshair BulletCrosshair;
-	BulletCrosshair.CenterTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairCenter.T_CrosshairCenter'")));
-	BulletCrosshair.TopLeftTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairTopLeft.T_CrosshairTopLeft'")));
-	BulletCrosshair.TopRightTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairTopRight.T_CrosshairTopRight'")));
-	BulletCrosshair.BottomLeftTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairBottomLeft.T_CrosshairBottomLeft'")));
-	BulletCrosshair.BottomRightTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairBottomRight.T_CrosshairBottomRight'")));
-	BulletCrosshair.Size = 40;
+TMap<CrosshairType, TSharedPtr<FCrosshairBase>> CreateCrosshairs() {
+	const auto CreateTextureFromPath = [](const TCHAR* Name) {
+		return Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, Name));
+	};
 
-	const TMap<CrosshairType, FCrosshair> Map {
+	auto BulletCrosshair = TSharedPtr<FBulletCrosshair>(new FBulletCrosshair);
+	BulletCrosshair->CenterTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairCenter.T_CrosshairCenter'"));
+	BulletCrosshair->TopLeftTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairTopLeft.T_CrosshairTopLeft'"));
+	BulletCrosshair->TopRightTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairTopRight.T_CrosshairTopRight'"));
+	BulletCrosshair->BottomLeftTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairBottomLeft.T_CrosshairBottomLeft'"));
+	BulletCrosshair->BottomRightTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_CrosshairBottomRight.T_CrosshairBottomRight'"));
+	BulletCrosshair->Size = 40;
+
+	auto GrenadeCrosshair = TSharedPtr<FGrenadeCrosshair>(new FGrenadeCrosshair);
+	GrenadeCrosshair->CenterTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_GrenadeCrosshair.T_GrenadeCrosshair'"));
+	GrenadeCrosshair->SliderTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_GrenadePowerSlider.T_GrenadePowerSlider'"));
+	GrenadeCrosshair->Size = 60;
+
+	const TMap<CrosshairType, TSharedPtr<FCrosshairBase>> Map {
 		{ CrosshairType::Bullet, BulletCrosshair },
-		{ CrosshairType::Rocket, BulletCrosshair }
+		{ CrosshairType::Rocket, BulletCrosshair },
+		{ CrosshairType::Grenade, GrenadeCrosshair }
 	};
 
 	return Map;
@@ -25,7 +35,7 @@ UCrosshairManager::UCrosshairManager() {
 	Crosshairs = CreateCrosshairs();
 }
 
-const FCrosshair& UCrosshairManager::GetCrosshair(CrosshairType Type) {
+const TSharedPtr<FCrosshairBase>& UCrosshairManager::GetCrosshair(CrosshairType Type) {
 	ensure(Crosshairs.Contains(Type));
 	return Crosshairs[Type];
 }

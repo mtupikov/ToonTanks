@@ -25,8 +25,7 @@ void AProjectileBase::BeginPlay() {
 		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 	}
 
-	SpawnPoint = GetActorLocation();
-	GetWorld()->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::DestroyProjectile, LifeSpanTime, false);
+	GetWorld()->GetTimerManager().SetTimer(LifeSpanTimerHandle, this, &AProjectileBase::Detonate, LifeSpanTime, false);
 }
 
 void AProjectileBase::OnHit(
@@ -50,14 +49,10 @@ void AProjectileBase::OnHit(
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(CameraHitShake);
 
-	DestroyProjectile();
+	Detonate();
 }
 
-FVector AProjectileBase::GetSpawnPoint() const {
-	return FVector();
-}
-
-void AProjectileBase::DestroyProjectile() {
+void AProjectileBase::Detonate() {
 	if (HitSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 	}

@@ -8,6 +8,7 @@
 #include "TowerOffence/Actors/MissleProjectile.h"
 #include "TowerOffence/Actors/HomingMissleProjectile.h"
 #include "TowerOffence/Actors/ForceFieldBase.h"
+#include "TowerOffence/Actors/GrenadeBase.h"
 #include "TowerOffence/Components/PawnMovementComponentBase.h"
 #include "TowerOffence/Components/ShootAmmunitionComponent.h"
 #include "TowerOffence/HUD/HUDBase.h"
@@ -46,15 +47,17 @@ void ATankBase::BeginPlay() {
 
 	const auto Ammunition = GetShootComponent()->GetAmmunition();
 	if (auto* Ptr = Ammunition.GetDefaultObject()) {
-		CrosshairType Type = CrosshairType::None;
+		Crosshair = CrosshairType::None;
 		if (Cast<AHitscanBase>(Ptr)) {
-			Type = CrosshairType::Bullet;
+			Crosshair = CrosshairType::Bullet;
 		} else if (Cast<AHomingMissleProjectile>(Ptr) || Cast<AMissleProjectile>(Ptr)) {
-			Type = CrosshairType::Rocket;
+			Crosshair = CrosshairType::Rocket;
+		} else if (Cast<AGrenadeBase>(Ptr)) {
+			Crosshair = CrosshairType::Grenade;
 		}
 
 		if (auto* CrosshairManager = TankHUD->GetCrosshairManager()) {
-			CrosshairManager->SetCrosshairType(Type);
+			CrosshairManager->SetCrosshairType(Crosshair);
 		} else {
 			UE_LOG(LogTemp, Warning, TEXT("Cannot get crosshair manager"));
 		}
@@ -119,14 +122,28 @@ void ATankBase::MoveForward(float Value) {
 }
 
 void ATankBase::BeginFire() {
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATankBase::RealeseFire, GetFireRate(), true);
+	switch (Crosshair) {
+	case CrosshairType::Grenade: {
+		BeginChargedFire();
+		break;
+	}
+	default: {
+		BeginDelayedFire();
+		break;
+	}
+	}
 }
 
 void ATankBase::EndFire() {
-	GetWorld()->GetTimerManager().ClearTimer(FireRateTimerHandle);
-
-	if (!GetWorld()->GetTimerManager().IsTimerActive(SingleFireRateTimerHandle)) {
-		RealeseFire();
+	switch (Crosshair) {
+	case CrosshairType::Grenade: {
+		EndChargedFire();
+		break;
+	}
+	default: {
+		EndDelayedFire();
+		break;
+	}
 	}
 }
 
@@ -156,6 +173,33 @@ void ATankBase::RequestForceFieldDeactivation() {
 	TimerManager.SetTimer(ForceFieldTimeoutTimerHandle, GetForceFieldTimeout(), false);
 }
 
+void ATankBase::BeginDelayedFire() {
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATankBase::RealeseFire, GetFireRate(), true);
+}
+
+void ATankBase::EndDelayedFire() {
+	GetWorld()->GetTimerManager().ClearTimer(FireRateTimerHandle);
+
+	if (!GetWorld()->GetTimerManager().IsTimerActive(SingleFireRateTimerHandle)) {
+		RealeseFire();
+	}
+}
+
+void ATankBase::BeginChargedFire() {
+	GetWorld()->GetTimerManager().SetTimer(ChargedFireTimerHandle, 1.0f, false);
+}
+
+void ATankBase::EndChargedFire() {
+	const auto ChargeTime = FMath::Abs(GetWorld()->GetTimerManager().GetTimerElapsed(ChargedFireTimerHandle));
+	GetWorld()->GetTimerManager().ClearTimer(ChargedFireTimerHandle);
+
+	if (TankHUD) {
+		TankHUD->SetCrosshairCharge(0.0f);
+	}
+
+	FireCharged(ChargeTime);
+}
+
 void ATankBase::OnForceFieldDestroyed() {
 	auto& TimerManager = GetWorld()->GetTimerManager();
 	TimerManager.ClearTimer(ForceFieldLifetimeTimerHandle);
@@ -164,6 +208,11 @@ void ATankBase::OnForceFieldDestroyed() {
 
 void ATankBase::Tick(float DeltaTime) {
 	APawnBase::Tick(DeltaTime);
+
+	if (TankHUD && GetWorld()->GetTimerManager().IsTimerActive(ChargedFireTimerHandle)) {
+		const auto Charge = GetWorld()->GetTimerManager().GetTimerElapsed(ChargedFireTimerHandle);
+		TankHUD->SetCrosshairCharge(Charge);
+	}
 }
 
 void ATankBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {

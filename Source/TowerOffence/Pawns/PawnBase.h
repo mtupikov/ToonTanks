@@ -76,6 +76,7 @@ protected:
 	);
 
 	virtual void Fire(USceneComponent* Target = nullptr);
+	virtual void FireCharged(float Charge, USceneComponent* Target = nullptr);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

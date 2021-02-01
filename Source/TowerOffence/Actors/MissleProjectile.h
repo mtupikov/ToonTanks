@@ -8,5 +8,5 @@ UCLASS()
 class TOWEROFFENCE_API AMissleProjectile : public AProjectileBase {
 	GENERATED_BODY()
 
-	virtual void DestroyProjectile() override;
+	virtual void Detonate() override;
 };

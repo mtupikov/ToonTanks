@@ -20,6 +20,12 @@ void AHUDBase::EnemyDamaged() {
 	GetWorld()->GetTimerManager().SetTimer(EnemyDamagedTimerHandle, 0.3f, false);
 }
 
+void AHUDBase::SetCrosshairCharge(float Value) {
+	if (CrosshairCharge != Value) {
+		CrosshairCharge = Value;
+	}
+}
+
 void AHUDBase::BeginPlay() {
 	PlayerPawn = Cast<APawnBase>(UGameplayStatics::GetPlayerPawn(this, 0));
 	CrosshairManager = NewObject<UCrosshairManager>(UCrosshairManager::StaticClass(), TEXT("Crosshair manager"));
@@ -58,11 +64,27 @@ void AHUDBase::DrawCrosshair() {
 	const auto CurrentCrosshairType = CrosshairManager->GetCurrentCrosshairType();
 	const auto& Crosshair = CrosshairManager->GetCrosshair(CurrentCrosshairType);
 
+	switch (CurrentCrosshairType) {
+	case CrosshairType::Bullet:
+	case CrosshairType::Rocket: {
+		DrawBulletCrosshair(StaticCastSharedPtr<FBulletCrosshair>(Crosshair));
+		break;
+	}
+	case CrosshairType::Grenade: {
+		DrawGrenadeCrosshair(StaticCastSharedPtr<FGrenadeCrosshair>(Crosshair));
+		break;
+	}
+	}
+}
+
+void AHUDBase::DrawBulletCrosshair(const TSharedPtr<FBulletCrosshair>& Crosshair) {
 	FLinearColor CrosshairColor;
 	const auto SizeX = Canvas->SizeX;
 	const auto SizeY = Canvas->SizeY;
 	const float CenterX = SizeX / 2;
 	const float CenterY = SizeY / 2;
+	const auto ScreenX = CenterX - Crosshair->Size / 2;
+	const auto ScreenY = CenterY - Crosshair->Size / 2;
 	auto Offset = PlayerPawn->GetShootComponent()->GetFireSpreadRadius();
 	const auto Alpha = 0.55f - FMath::GetMappedRangeValueClamped({ 0.0f, 10.0f }, { 0.05f, 0.5f }, Offset);
 
@@ -73,13 +95,13 @@ void AHUDBase::DrawCrosshair() {
 		CrosshairColor = FLinearColor(0.0f, 0.0f, 0.0f, Alpha);
 	}
 
-	if (Crosshair.CenterTexture) {
+	if (Crosshair->CenterTexture) {
 		DrawTexture(
-			Crosshair.CenterTexture,
-			CenterX - Crosshair.Size / 2,
-			CenterY - Crosshair.Size / 2,
-			Crosshair.Size,
-			Crosshair.Size,
+			Crosshair->CenterTexture,
+			ScreenX,
+			ScreenY,
+			Crosshair->Size,
+			Crosshair->Size,
 			0,
 			0,
 			1,
@@ -89,13 +111,13 @@ void AHUDBase::DrawCrosshair() {
 		);
 	}
 
-	if (Crosshair.TopLeftTexture) {
+	if (Crosshair->TopLeftTexture) {
 		DrawTexture(
-			Crosshair.TopLeftTexture,
-			CenterX - Crosshair.Size / 2 - Offset,
-			CenterY - Crosshair.Size / 2 - Offset,
-			Crosshair.Size,
-			Crosshair.Size,
+			Crosshair->TopLeftTexture,
+			ScreenX - Offset,
+			ScreenY - Offset,
+			Crosshair->Size,
+			Crosshair->Size,
 			0,
 			0,
 			1,
@@ -105,13 +127,13 @@ void AHUDBase::DrawCrosshair() {
 		);
 	}
 
-	if (Crosshair.TopRightTexture) {
+	if (Crosshair->TopRightTexture) {
 		DrawTexture(
-			Crosshair.TopRightTexture,
-			CenterX - Crosshair.Size / 2 + Offset,
-			CenterY - Crosshair.Size / 2 - Offset,
-			Crosshair.Size,
-			Crosshair.Size,
+			Crosshair->TopRightTexture,
+			ScreenX + Offset,
+			ScreenY - Offset,
+			Crosshair->Size,
+			Crosshair->Size,
 			0,
 			0,
 			1,
@@ -121,13 +143,13 @@ void AHUDBase::DrawCrosshair() {
 		);
 	}
 
-	if (Crosshair.BottomLeftTexture) {
+	if (Crosshair->BottomLeftTexture) {
 		DrawTexture(
-			Crosshair.BottomLeftTexture,
-			CenterX - Crosshair.Size / 2 - Offset,
-			CenterY - Crosshair.Size / 2 + Offset,
-			Crosshair.Size,
-			Crosshair.Size,
+			Crosshair->BottomLeftTexture,
+			ScreenX - Offset,
+			ScreenY + Offset,
+			Crosshair->Size,
+			Crosshair->Size,
 			0,
 			0,
 			1,
@@ -137,18 +159,68 @@ void AHUDBase::DrawCrosshair() {
 		);
 	}
 
-	if (Crosshair.BottomRightTexture) {
+	if (Crosshair->BottomRightTexture) {
 		DrawTexture(
-			Crosshair.BottomRightTexture,
-			CenterX - Crosshair.Size / 2 + Offset,
-			CenterY - Crosshair.Size / 2 + Offset,
-			Crosshair.Size,
-			Crosshair.Size,
+			Crosshair->BottomRightTexture,
+			ScreenX + Offset,
+			ScreenY + Offset,
+			Crosshair->Size,
+			Crosshair->Size,
 			0,
 			0,
 			1,
 			1,
 			CrosshairColor,
+			EBlendMode::BLEND_Translucent
+		);
+	}
+}
+
+void AHUDBase::DrawGrenadeCrosshair(const TSharedPtr<FGrenadeCrosshair>& Crosshair) {
+	FLinearColor CrosshairColor;
+	const auto SizeX = Canvas->SizeX;
+	const auto SizeY = Canvas->SizeY;
+	const float CenterX = SizeX / 2;
+	const float CenterY = SizeY / 2;
+	const auto ScreenX = CenterX - Crosshair->Size / 2;
+	const auto ScreenY = CenterY - Crosshair->Size / 2;
+	//auto Offset = PlayerPawn->GetShootComponent()->GetFireSpreadRadius();
+	const auto Alpha = 0.55f;
+
+	if (GetWorld()->GetTimerManager().IsTimerActive(EnemyDamagedTimerHandle)) {
+		CrosshairColor = FLinearColor(1.0f, 0.0f, 0.0f, Alpha);
+	} else {
+		CrosshairColor = FLinearColor(0.0f, 0.0f, 0.0f, Alpha);
+	}
+
+	if (Crosshair->CenterTexture) {
+		DrawTexture(
+			Crosshair->CenterTexture,
+			ScreenX,
+			ScreenY,
+			Crosshair->Size,
+			Crosshair->Size,
+			0,
+			0,
+			1,
+			1,
+			CrosshairColor,
+			EBlendMode::BLEND_Translucent
+		);
+	}
+
+	if (Crosshair->SliderTexture) {
+		DrawTexture(
+			Crosshair->SliderTexture,
+			ScreenX,
+			ScreenY - CrosshairCharge * (Crosshair->Size / 2.35f),
+			Crosshair->Size,
+			Crosshair->Size,
+			0,
+			0,
+			1,
+			1,
+			FLinearColor(0.0f, 0.0f, 0.0f, 0.5f),
 			EBlendMode::BLEND_Translucent
 		);
 	}
