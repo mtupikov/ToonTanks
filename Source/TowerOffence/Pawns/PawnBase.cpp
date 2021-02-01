@@ -210,6 +210,10 @@ float APawnBase::MaximumRotationAngle() {
 }
 
 void APawnBase::HandleDestruction() {
+	if (ForceField && ForceField->IsActive()) {
+		ForceField->Deactivate();
+	}
+
 	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
 	UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticle, GetActorLocation());
 }
