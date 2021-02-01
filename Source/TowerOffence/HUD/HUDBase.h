@@ -11,6 +11,7 @@ class UUserWidget;
 struct FBulletCrosshair;
 struct FMissleCrosshair;
 struct FGrenadeCrosshair;
+struct FRailShotCrosshair;
 
 UCLASS()
 class TOWEROFFENCE_API AHUDBase : public AHUD {
@@ -35,6 +36,7 @@ protected:
 	void DrawBulletCrosshair(const TSharedPtr<FBulletCrosshair>& Crosshair);
 	void DrawMissleCrosshair(const TSharedPtr<FMissleCrosshair>& Crosshair);
 	void DrawGrenadeCrosshair(const TSharedPtr<FGrenadeCrosshair>& Crosshair);
+	void DrawRailShotCrosshair(const TSharedPtr<FRailShotCrosshair>& Crosshair);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> HealthClass;

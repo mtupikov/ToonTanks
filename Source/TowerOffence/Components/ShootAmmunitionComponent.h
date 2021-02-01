@@ -24,7 +24,7 @@ public:
 	float GetFireSpreadRadius() const;
 
 private:
-	void FireHitscan(const FVector& SpawnLocation, const FRotator& SpawnRotation);
+	void FireHitscan(const FVector& SpawnLocation, const FRotator& SpawnRotation, float Charge);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spread", meta = (AllowPrivateAccess = "true"))
 	UWeaponSpreadManager* WeaponSpreadManager = nullptr;

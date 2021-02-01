@@ -13,7 +13,7 @@ class TOWEROFFENCE_API AHitscanBase : public AAmmunitionBase {
 public:
 	AHitscanBase();
 
-	void Fire(const FVector& AimDirection, const FVector& StartLocation);
+	void Fire(const FVector& AimDirection, const FVector& StartLocation, float Charge = 1.0f);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Effects")
@@ -31,6 +31,7 @@ private:
 		const TArray<FHitResult>& Impacts,
 		const FVector& Origin,
 		const FVector& End,
-		const FVector& ShootDir
+		const FVector& ShootDir,
+		float Charge
 	);
 };

@@ -27,10 +27,18 @@ TMap<CrosshairType, TSharedPtr<FCrosshairBase>> CreateCrosshairs() {
 	GrenadeCrosshair->SliderTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_GrenadePowerSlider.T_GrenadePowerSlider'"));
 	GrenadeCrosshair->Size = 60;
 
+	auto RailCrosshair = TSharedPtr<FRailShotCrosshair>(new FRailShotCrosshair);
+	RailCrosshair->TopLeftTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_RailShotTopLeft.T_RailShotTopLeft'"));
+	RailCrosshair->TopRightTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_RailShotTopRight.T_RailShotTopRight'"));
+	RailCrosshair->BottomLeftTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_RailShotBottomLeft.T_RailShotBottomLeft'"));
+	RailCrosshair->BottomRightTexture = CreateTextureFromPath(TEXT("Texture2D'/Game/Assets/Textures/HUD/T_RailShotBottomRight.T_RailShotBottomRight'"));
+	GrenadeCrosshair->Size = 25;
+
 	const TMap<CrosshairType, TSharedPtr<FCrosshairBase>> Map {
 		{ CrosshairType::Bullet, BulletCrosshair },
 		{ CrosshairType::Rocket, MissleCrosshair },
-		{ CrosshairType::Grenade, GrenadeCrosshair }
+		{ CrosshairType::Grenade, GrenadeCrosshair },
+		{ CrosshairType::RailShot, RailCrosshair }
 	};
 
 	return Map;

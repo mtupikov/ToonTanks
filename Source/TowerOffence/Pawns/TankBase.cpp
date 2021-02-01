@@ -4,7 +4,8 @@
 #include "Camera/CameraComponent.h"
 #include "Camera/CameraShake.h"
 
-#include "TowerOffence/Actors/HitscanBase.h"
+#include "TowerOffence/Actors/Bullet.h"
+#include "TowerOffence/Actors/RailShot.h"
 #include "TowerOffence/Actors/MissleProjectile.h"
 #include "TowerOffence/Actors/HomingMissleProjectile.h"
 #include "TowerOffence/Actors/ForceFieldBase.h"
@@ -48,12 +49,14 @@ void ATankBase::BeginPlay() {
 	const auto Ammunition = GetShootComponent()->GetAmmunition();
 	if (auto* Ptr = Ammunition.GetDefaultObject()) {
 		Crosshair = CrosshairType::None;
-		if (Cast<AHitscanBase>(Ptr)) {
+		if (Cast<ABullet>(Ptr)) {
 			Crosshair = CrosshairType::Bullet;
 		} else if (Cast<AHomingMissleProjectile>(Ptr) || Cast<AMissleProjectile>(Ptr)) {
 			Crosshair = CrosshairType::Rocket;
 		} else if (Cast<AGrenadeBase>(Ptr)) {
 			Crosshair = CrosshairType::Grenade;
+		} else if (Cast<ARailShot>(Ptr)) {
+			Crosshair = CrosshairType::RailShot;
 		}
 
 		if (auto* CrosshairManager = TankHUD->GetCrosshairManager()) {
@@ -123,6 +126,7 @@ void ATankBase::MoveForward(float Value) {
 
 void ATankBase::BeginFire() {
 	switch (Crosshair) {
+	case CrosshairType::RailShot:
 	case CrosshairType::Grenade: {
 		BeginChargedFire();
 		break;
@@ -136,6 +140,7 @@ void ATankBase::BeginFire() {
 
 void ATankBase::EndFire() {
 	switch (Crosshair) {
+	case CrosshairType::RailShot:
 	case CrosshairType::Grenade: {
 		EndChargedFire();
 		break;

@@ -77,6 +77,10 @@ void AHUDBase::DrawCrosshair() {
 		DrawGrenadeCrosshair(StaticCastSharedPtr<FGrenadeCrosshair>(Crosshair));
 		break;
 	}
+	case CrosshairType::RailShot: {
+		DrawRailShotCrosshair(StaticCastSharedPtr<FRailShotCrosshair>(Crosshair));
+		break;
+	}
 	}
 }
 
@@ -270,7 +274,6 @@ void AHUDBase::DrawGrenadeCrosshair(const TSharedPtr<FGrenadeCrosshair>& Crossha
 	const float CenterY = SizeY / 2;
 	const auto ScreenX = CenterX - Crosshair->Size / 2;
 	const auto ScreenY = CenterY - Crosshair->Size / 2;
-	//auto Offset = PlayerPawn->GetShootComponent()->GetFireSpreadRadius();
 	const auto Alpha = 0.55f;
 
 	if (GetWorld()->GetTimerManager().IsTimerActive(EnemyDamagedTimerHandle)) {
@@ -307,6 +310,88 @@ void AHUDBase::DrawGrenadeCrosshair(const TSharedPtr<FGrenadeCrosshair>& Crossha
 			1,
 			1,
 			FLinearColor(0.0f, 0.0f, 0.0f, 0.5f),
+			EBlendMode::BLEND_Translucent
+		);
+	}
+}
+
+void AHUDBase::DrawRailShotCrosshair(const TSharedPtr<FRailShotCrosshair>& Crosshair) {
+	FLinearColor CrosshairColor;
+	const auto SizeX = Canvas->SizeX;
+	const auto SizeY = Canvas->SizeY;
+	const float CenterX = SizeX / 2;
+	const float CenterY = SizeY / 2;
+	const auto ScreenX = CenterX - Crosshair->Size / 2;
+	const auto ScreenY = CenterY - Crosshair->Size / 2;
+	const auto Alpha = 0.55f;
+	const auto ChargeOffset = CrosshairCharge * 8.0f;
+
+	if (GetWorld()->GetTimerManager().IsTimerActive(EnemyDamagedTimerHandle)) {
+		CrosshairColor = FLinearColor(1.0f, 0.0f, 0.0f, Alpha);
+	} else {
+		CrosshairColor = FLinearColor(0.0f, 0.0f, 0.0f, Alpha);
+	}
+
+	if (Crosshair->TopLeftTexture) {
+		DrawTexture(
+			Crosshair->TopLeftTexture,
+			ScreenX + ChargeOffset,
+			ScreenY + ChargeOffset,
+			Crosshair->Size,
+			Crosshair->Size,
+			0,
+			0,
+			1,
+			1,
+			CrosshairColor,
+			EBlendMode::BLEND_Translucent
+		);
+	}
+
+	if (Crosshair->TopRightTexture) {
+		DrawTexture(
+			Crosshair->TopRightTexture,
+			ScreenX - ChargeOffset,
+			ScreenY + ChargeOffset,
+			Crosshair->Size,
+			Crosshair->Size,
+			0,
+			0,
+			1,
+			1,
+			CrosshairColor,
+			EBlendMode::BLEND_Translucent
+		);
+	}
+
+	if (Crosshair->BottomLeftTexture) {
+		DrawTexture(
+			Crosshair->BottomLeftTexture,
+			ScreenX + ChargeOffset,
+			ScreenY - ChargeOffset,
+			Crosshair->Size,
+			Crosshair->Size,
+			0,
+			0,
+			1,
+			1,
+			CrosshairColor,
+			EBlendMode::BLEND_Translucent
+		);
+	}
+
+	if (Crosshair->BottomRightTexture) {
+		DrawTexture(
+			Crosshair->BottomRightTexture,
+			ScreenX - ChargeOffset,
+			ScreenY - ChargeOffset,
+			Crosshair->Size,
+			Crosshair->Size,
+			0,
+			0,
+			1,
+			1,
+			CrosshairColor,
 			EBlendMode::BLEND_Translucent
 		);
 	}

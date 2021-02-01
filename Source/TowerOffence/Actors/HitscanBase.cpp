@@ -12,7 +12,7 @@
 AHitscanBase::AHitscanBase() {
 }
 
-void AHitscanBase::Fire(const FVector& AimDirection, const FVector& StartLocation) {
+void AHitscanBase::Fire(const FVector& AimDirection, const FVector& StartLocation, float Charge) {
 	if (LaunchSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 	}
@@ -20,7 +20,7 @@ void AHitscanBase::Fire(const FVector& AimDirection, const FVector& StartLocatio
 	const auto EndTrace = StartLocation + AimDirection * Range;
 	const auto Impacts = WeaponTrace(StartLocation, EndTrace);
 
-	ProcessInstantHit(Impacts, StartLocation, EndTrace, AimDirection);
+	ProcessInstantHit(Impacts, StartLocation, EndTrace, AimDirection, Charge);
 }
 
 TArray<FHitResult> AHitscanBase::WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo) const {
@@ -41,7 +41,8 @@ void AHitscanBase::ProcessInstantHit(
 	const TArray<FHitResult>& Impacts,
 	const FVector& Origin,
 	const FVector& End,
-	const FVector& ShootDir
+	const FVector& ShootDir,
+	float Charge
 ) {
 	FVector EndPoint;
 	FVector TraceEnd;
@@ -113,7 +114,7 @@ void AHitscanBase::ProcessInstantHit(
 	//FlushPersistentDebugLines(Actor->GetWorld());
 	//DrawDebugLine(Actor->GetWorld(), Origin, TraceEnd, FColor::Black, true, 1.0f, 10.f);
 
-	UGameplayStatics::ApplyDamage(Actor, Damage, GetOwner()->GetInstigatorController(), this, DamageType);
+	UGameplayStatics::ApplyDamage(Actor, Charge * Damage, GetOwner()->GetInstigatorController(), this, DamageType);
 
 	if (HitSound) {
 		UGameplayStatics::PlaySoundAtLocation(this, HitSound, EndPoint);

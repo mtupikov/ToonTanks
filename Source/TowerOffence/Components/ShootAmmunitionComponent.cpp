@@ -1,7 +1,8 @@
 #include "ShootAmmunitionComponent.h"
 
 #include "TowerOffence/Actors/AmmunitionBase.h"
-#include "TowerOffence/Actors/HitscanBase.h"
+#include "TowerOffence/Actors/Bullet.h"
+#include "TowerOffence/Actors/RailShot.h"
 #include "TowerOffence/Actors/HomingMissleProjectile.h"
 #include "TowerOffence/Actors/GrenadeBase.h"
 #include "TowerOffence/Utils/WeaponSpreadManager.h"
@@ -33,7 +34,7 @@ void UShootAmmunitionComponent::Fire(const FVector& SpawnLocation, const FRotato
 	WeaponSpreadManager->OnShotFired();
 
 	if (CachedHitscan) {
-		FireHitscan(SpawnLocation, ShootDir);
+		FireHitscan(SpawnLocation, ShootDir, Charge);
 		return;
 	}
 
@@ -52,7 +53,7 @@ void UShootAmmunitionComponent::Fire(const FVector& SpawnLocation, const FRotato
 
 	if (auto* Hitscan = Cast<AHitscanBase>(Ammunition)) {
 		CachedHitscan = Hitscan;
-		FireHitscan(SpawnLocation, ShootDir);
+		FireHitscan(SpawnLocation, ShootDir, Charge);
 		return;
 	}
 
@@ -77,7 +78,7 @@ void UShootAmmunitionComponent::SetAmmunition(TSubclassOf<AAmmunitionBase> Proje
 		float SpreadDecrease = 0.0f;
 		float SpreadRadiusCoef = 1.0f;
 
-		if (Cast<AHitscanBase>(Ptr)) {
+		if (Cast<ABullet>(Ptr)) {
 			MaxShots = 5.0f;
 			SpreadDecrease = 0.025;
 			SpreadRadiusCoef = 2.0f;
@@ -91,6 +92,8 @@ void UShootAmmunitionComponent::SetAmmunition(TSubclassOf<AAmmunitionBase> Proje
 			SpreadDecrease = 0.001;
 			MaxShots = 2.0f;
 			SpreadRadiusCoef = 4.0f;
+		} else if (Cast<ARailShot>(Ptr)) {
+			SpreadRadiusCoef = 0.0f;
 		}
 
 		WeaponSpreadManager->SetSpreadDecreaseValue(SpreadDecrease);
@@ -107,6 +110,6 @@ float UShootAmmunitionComponent::GetFireSpreadRadius() const {
 	return WeaponSpreadManager->GetSpreadRadius();
 }
 
-void UShootAmmunitionComponent::FireHitscan(const FVector& SpawnLocation, const FRotator& SpawnRotation) {
-	CachedHitscan->Fire(SpawnRotation.Vector(), SpawnLocation);
+void UShootAmmunitionComponent::FireHitscan(const FVector& SpawnLocation, const FRotator& SpawnRotation, float Charge) {
+	CachedHitscan->Fire(SpawnRotation.Vector(), SpawnLocation, Charge);
 }
